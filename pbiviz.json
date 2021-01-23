@@ -1,1 +1,25 @@
-{"visual":{"name":"reactCircleCard","displayName":"ReactCircleCard","guid":"reactCircleCardE4A5FEA73E9F42BCB6D6B1E16E59EF33","visualClassName":"Visual","version":"1.0.0","description":"","supportUrl":"","gitHubUrl":""},"apiVersion":"2.6.0","author":{"name":"","email":""},"assets":{"icon":"assets/icon.png"},"externalJS":null,"style":"style/visual.less","capabilities":"capabilities.json","dependencies":null,"stringResources":[]}
+{
+    "visual": {
+        "name": "DBI_magicTable",
+        "displayName": "DBI_magicTable",
+        "guid": "DBI_magicTableE4A5FEA73E9F42BCB6D6B1E16E59EF33",
+        "visualClassName": "Visual",
+        "version": "1.0.0",
+        "description": "Magic table for magic Stepan",
+        "supportUrl": "https://www.jaknapowerbi.cz/",
+        "gitHubUrl": "https://github.com/hroudaadam/DBI_magicTable"
+    },
+    "apiVersion": "2.6.0",
+    "author": {
+        "name": "Adam Hrouda",
+        "email": "hroudaadam@gmail.com"
+    },
+    "assets": {
+        "icon": "assets/icon.png"
+    },
+    "externalJS": null,
+    "style": "style/visual.less",
+    "capabilities": "capabilities.json",
+    "dependencies": null,
+    "stringResources": []
+}

@@ -1,7 +1,7 @@
 {
     "dataRoles": [
         {
-            "displayName": "Grouping",
+            "displayName": "Columns",
             "name": "column",
             "kind": "Grouping"
         }

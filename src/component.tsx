@@ -2,15 +2,16 @@ import { values } from "d3";
 import * as React from "react";
 
 export interface State {
-    data
+    data,
+    size
 }
 
 export const initialState: State = {
     data: {
         columns: [],
-        rows: [
-        ]
-    }
+        rows: []
+    },
+    size: 200
 }
 
 export class ReactCircleCard extends React.Component<{}, State>{
@@ -21,6 +22,7 @@ export class ReactCircleCard extends React.Component<{}, State>{
     constructor(props: any) {
         super(props);
         this.state = initialState;
+        this.handleSaveBtnClick = this.handleSaveBtnClick.bind(this);
     }
 
     public static update(newState: State) {
@@ -31,6 +33,7 @@ export class ReactCircleCard extends React.Component<{}, State>{
 
     public componentWillMount() {
         ReactCircleCard.updateCallback = (newState: State): void => { this.setState(newState); };
+        this.transformBody();
     }
 
     public componentWillUnmount() {
@@ -51,13 +54,53 @@ export class ReactCircleCard extends React.Component<{}, State>{
         );
     }
 
+    private getIndexOfPkCol() {
+        var cols: Array<String> = this.state.data.columns;
+        return cols.findIndex(col => col === "ID");
+    }
+
     private handleSaveBtnClick(event) {
         console.log("Click!");
+        var url = "https://prod-140.westeurope.logic.azure.com:443/workflows/101633d73f5447d2b60a837670fdbadc/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=3B_Oq59FZuJVXG8nq3k4pHLgTn64p6i7FlUwTTNQIsw";
+        var body = this.transformBody();
+
+        fetch(url, {
+            method: "POST",
+            body: JSON.stringify(body)
+        })
+            .then((resp) => {
+                resp.text();
+            })
+            .then((text) => {
+                console.log("response: " + text);
+            })
+            .catch((err) => {
+                console.error("error: " + err);
+            })
+    }
+
+    private transformBody() {
+        var newBody = [];
+        const rows = this.state.data.rows;
+        const cols = this.state.data.columns;
+
+        for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            let newObjectRow = {};
+
+            for (let j = 0; j < cols.length; j++) {
+                const col = cols[j];
+                newObjectRow[col] = row[j];
+            }
+            newBody.push(newObjectRow);
+        }
+        return newBody;
     }
 
     private renderTableBody() {
         const colsCount = this.state.data.columns.length;
         let tableBodyJsx = [];
+        const pkColIndex = this.getIndexOfPkCol();
 
         for (let i = 0; i < this.state.data.rows.length; i++) {
 
@@ -65,14 +108,17 @@ export class ReactCircleCard extends React.Component<{}, State>{
             let rowsJsx = [];
 
             for (let j = 0; j < colsCount; j++) {
-                const value = row[j];
-                const eventContext = { rowI: i, colI: j };
+                if (pkColIndex != j) {
+                    const value = row[j];
+                    const eventContext = { rowI: i, colI: j };
 
-                rowsJsx.push(
-                    <td contentEditable="true" onChange={this.handleCellChanged.bind(this, eventContext)}>
-                        {value}
-                    </td>
-                );
+                    rowsJsx.push(
+                        <td contentEditable="true" onChange={this.handleCellChanged.bind(this, eventContext)}>
+                            {value}
+                        </td>
+                    );
+                }
+
             }
 
             tableBodyJsx.push(
@@ -87,27 +133,33 @@ export class ReactCircleCard extends React.Component<{}, State>{
     private renderTableHeader() {
         let tableHeaderJsx = [];
         const cols = this.state.data.columns;
+        const pkColIndex = this.getIndexOfPkCol();
 
         for (let i = 0; i < cols.length; i++) {
-            const column = cols[i];
+            if (pkColIndex != i) {
+                const column = cols[i];
 
-            tableHeaderJsx.push(
-                <th>{column}</th>
-            )
+                tableHeaderJsx.push(
+                    <th>{column}</th>
+                )
+            }
+
         }
-
         return tableHeaderJsx;
     }
 
 
     render() {
+        const sizeStyle = {height: this.state.size};
+
         if (this.state.data.columns.length > 0) {
             return (
                 <div>
                     <div className="flex--justify-between mb-2">
-                        <span className="h2">Visual tabulky</span>
+                        <span className="h2">DBI Magic Table</span>
                         <button className="button" onClick={this.handleSaveBtnClick}>Save changes</button>
                     </div>
+                    <div className="tableFixHead" style={sizeStyle}>
                     <table>
                         <thead>
                             <tr>
@@ -118,13 +170,15 @@ export class ReactCircleCard extends React.Component<{}, State>{
                             {this.renderTableBody()}
                         </tbody>
                     </table>
+
+                    </div>
                 </div>
             )
         }
         else {
             return (
-                <div>
-                    <p>Přidejte data</p>
+                <div className="error-block">
+                    <span>Nejsou k dispozici žádná data</span>
                 </div>
             )
         }

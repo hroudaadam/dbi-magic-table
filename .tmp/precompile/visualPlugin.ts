@@ -5,9 +5,9 @@ import VisualConstructorOptions = powerbiVisualsApi.extensibility.visual.VisualC
 var powerbiKey: any = "powerbi";
 var powerbi: any = window[powerbiKey];
 
-var reactCircleCardE4A5FEA73E9F42BCB6D6B1E16E59EF33_DEBUG: IVisualPlugin = {
-    name: 'reactCircleCardE4A5FEA73E9F42BCB6D6B1E16E59EF33_DEBUG',
-    displayName: 'ReactCircleCard',
+var DBI_magicTableE4A5FEA73E9F42BCB6D6B1E16E59EF33_DEBUG: IVisualPlugin = {
+    name: 'DBI_magicTableE4A5FEA73E9F42BCB6D6B1E16E59EF33_DEBUG',
+    displayName: 'DBI_magicTable',
     class: 'Visual',
     apiVersion: '2.6.0',
     create: (options: VisualConstructorOptions) => {
@@ -23,7 +23,7 @@ var reactCircleCardE4A5FEA73E9F42BCB6D6B1E16E59EF33_DEBUG: IVisualPlugin = {
 if (typeof powerbi !== "undefined") {
     powerbi.visuals = powerbi.visuals || {};
     powerbi.visuals.plugins = powerbi.visuals.plugins || {};
-    powerbi.visuals.plugins["reactCircleCardE4A5FEA73E9F42BCB6D6B1E16E59EF33_DEBUG"] = reactCircleCardE4A5FEA73E9F42BCB6D6B1E16E59EF33_DEBUG;
+    powerbi.visuals.plugins["DBI_magicTableE4A5FEA73E9F42BCB6D6B1E16E59EF33_DEBUG"] = DBI_magicTableE4A5FEA73E9F42BCB6D6B1E16E59EF33_DEBUG;
 }
 
-export default reactCircleCardE4A5FEA73E9F42BCB6D6B1E16E59EF33_DEBUG;
+export default DBI_magicTableE4A5FEA73E9F42BCB6D6B1E16E59EF33_DEBUG;

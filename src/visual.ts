@@ -9,12 +9,14 @@ import IVisual = powerbi.extensibility.visual.IVisual;
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { ReactCircleCard, initialState } from "./component";
+import IViewport = powerbi.IViewport;
 
 import "./../style/visual.less";
 
 export class Visual implements IVisual {
     private target: HTMLElement;
     private reactRoot: React.ComponentElement<any, any>;
+    private viewport: IViewport;
 
     constructor(options: VisualConstructorOptions) {
         this.reactRoot = React.createElement(ReactCircleCard, {});
@@ -27,12 +29,14 @@ export class Visual implements IVisual {
 
         if (options.dataViews && options.dataViews[0]){
             const dataView: DataView = options.dataViews[0];
-            const data = this.transformData(dataView);
+            const data = this.transformData(dataView);            
+            const size = options.viewport.height - 80;
 
-            console.log(data);
+            // console.log(data);
 
             ReactCircleCard.update({
-                data: data
+                data: data,
+                size: size
             });
         } else {
             this.clear();

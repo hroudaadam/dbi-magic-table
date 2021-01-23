@@ -19,32 +19,36 @@ time, mark, audio, video {
 	vertical-align: baseline;
 }
 
-th {
-    text-align: left;
-    font-weight: bold;
-    padding: 8px;
-    border: 0.5px solid #000000;
-    background-color: #dfd9d9;
-}  
+.tableFixHead { 
+    overflow-y: auto; 
+}
 
-table {
-    border-collapse: collapse;
+table  {
+    width: 100%; 
     border-spacing: 0;
-    width: 100%;
-    border: 0.5px solid #000000;
+    border-collapse: separate; 
+    border-spacing: 0;
 }
 
-td {
-    text-align: left;
-    padding: 8px;
-    border: 0.5px solid #000000;
+table th:first-child,
+table td:first-child {
+  border-left: 0.5px solid;
 }
 
-td:focus {
-    background-color: #ee9e9e;
-    outline-width: 0px;
-
+th, td { 
+    padding: 8px 16px; 
+    border-bottom: 0.5px solid;
+    border-right: 0.5px solid;
 }
+
+th { 
+    background:#eee; 
+    border-top: 0.5px solid;
+    position: sticky; 
+    top: 0; 
+    font-weight: bold;
+}
+
 
 .flex--justify-between {
     display: flex;
@@ -94,6 +98,15 @@ td:focus {
 
 .mb-3 {
     margin-bottom: 3px;
+}
+
+.error-block {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2em;
+    color: #7e1a1a;
 }
   
 // tr:nth-child(even) {
