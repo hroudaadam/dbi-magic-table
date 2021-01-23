@@ -3,4 +3,3 @@ package-lock.json
 dist
 test_data
 .vscode
-.tmp
