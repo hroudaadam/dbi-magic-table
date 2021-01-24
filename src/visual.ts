@@ -49,7 +49,7 @@ export class Visual implements IVisual {
 
             ReactCircleCard.update({
                 data: data,
-                size: size
+                size: size,
                 apiUrl: apiUrl
             });
         } else {
