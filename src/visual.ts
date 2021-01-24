@@ -38,14 +38,13 @@ export class Visual implements IVisual {
             const dataView: DataView = options.dataViews[0];
             const data = this.transformData(dataView);            
             const size = options.viewport.height - 50;
-            var apiUrl = options.dataViews[0].metadata.objects.dataPoint.apiUrl;
-            console.log("API URL: " + apiUrl);
 
-            // if (!apiUrl) {
-            //     apiUrl = "text";
-            // }
-
-            // console.log(apiUrl);
+            var apiUrl:String = "";
+            if (options.dataViews[0].metadata.objects) {
+                if (options.dataViews[0].metadata.objects.apiTest.apiUrl) {
+                    apiUrl = options.dataViews[0].metadata.objects.apiTest.apiUrl.toString();
+                }
+            }
 
             ReactCircleCard.update({
                 data: data,

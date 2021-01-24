@@ -72,7 +72,6 @@ export class ReactCircleCard extends React.Component<{}, State>{
         // var url = "https://prod-140.westeurope.logic.azure.com:443/workflows/101633d73f5447d2b60a837670fdbadc/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=3B_Oq59FZuJVXG8nq3k4pHLgTn64p6i7FlUwTTNQIsw";
         var url = this.state.apiUrl;
         var body = this.transformBody();
-        console.log(JSON.stringify(body));
 
         fetch(url, {
             method: "POST",
@@ -125,7 +124,7 @@ export class ReactCircleCard extends React.Component<{}, State>{
 
                     rowsJsx.push(
                         <td >
-                            <input className="input-cell" type="text" value={value} onChange={this.handleCellChanged.bind(this, eventContext)}/>
+                            <input className="input-cell" type="text" value={value} onChange={this.handleCellChanged.bind(this, eventContext)} />
                         </td>
                     );
                 }
@@ -162,7 +161,7 @@ export class ReactCircleCard extends React.Component<{}, State>{
 
 
     render() {
-        const sizeStyle = {height: this.state.size};
+        const sizeStyle = { height: this.state.size };
 
         if (this.state.data.columns.length > 0) {
             return (
@@ -170,17 +169,17 @@ export class ReactCircleCard extends React.Component<{}, State>{
                     <div className="flex--justify-right mb-2">
                         <button className="button" onClick={this.handleSaveBtnClick}>Save changes</button>
                     </div>
-                    <div className="tableFixHead" style={sizeStyle}>
-                    <table>
-                        <thead>
-                            <tr>
-                                {this.renderTableHeader()}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {this.renderTableBody()}
-                        </tbody>
-                    </table>
+                    <div className="table-scroll" style={sizeStyle}>
+                        <table>
+                            <thead>
+                                <tr>
+                                    {this.renderTableHeader()}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {this.renderTableBody()}
+                            </tbody>
+                        </table>
 
                     </div>
                 </div>
