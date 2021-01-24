@@ -37,7 +37,7 @@ export class VisualSettings extends DataViewObjectsParser {
      // Default color
       public defaultColor: string = "";
      // Show all
-      public showAllDataPoints: boolean = true;
+      public apiUrl: String = "";
      // Fill
       public fill: string = "";
      // Color saturation

@@ -3,7 +3,8 @@ import * as React from "react";
 
 export interface State {
     data,
-    size
+    size,
+    apiUrl
 }
 
 export const initialState: State = {
@@ -11,7 +12,8 @@ export const initialState: State = {
         columns: [],
         rows: []
     },
-    size: 200
+    size: 200,
+    apiUrl: ""
 }
 
 export class ReactCircleCard extends React.Component<{}, State>{
@@ -47,11 +49,14 @@ export class ReactCircleCard extends React.Component<{}, State>{
         let rows = this.state.data.rows;
         rows[rowI][colI] = value;
 
-        this.setState(
-            {
-                data: rows
-            }
-        );
+        this.setState((prevState => ({
+            data: {
+                columns: prevState.data.columns,
+                rows: prevState.data.rows
+            },
+            size: prevState.size,
+            apiUrl: prevState.apiUrl
+        })));
     }
 
     private getIndexOfPkCol() {
@@ -60,9 +65,14 @@ export class ReactCircleCard extends React.Component<{}, State>{
     }
 
     private handleSaveBtnClick(event) {
-        console.log("Click!");
-        var url = "https://prod-140.westeurope.logic.azure.com:443/workflows/101633d73f5447d2b60a837670fdbadc/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=3B_Oq59FZuJVXG8nq3k4pHLgTn64p6i7FlUwTTNQIsw";
+        if (this.getIndexOfPkCol() < 0) {
+            return;
+        }
+
+        // var url = "https://prod-140.westeurope.logic.azure.com:443/workflows/101633d73f5447d2b60a837670fdbadc/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=3B_Oq59FZuJVXG8nq3k4pHLgTn64p6i7FlUwTTNQIsw";
+        var url = this.state.apiUrl;
         var body = this.transformBody();
+        console.log(JSON.stringify(body));
 
         fetch(url, {
             method: "POST",
@@ -109,12 +119,13 @@ export class ReactCircleCard extends React.Component<{}, State>{
 
             for (let j = 0; j < colsCount; j++) {
                 if (pkColIndex != j) {
-                    const value = row[j];
+                    var value = row[j];
+
                     const eventContext = { rowI: i, colI: j };
 
                     rowsJsx.push(
-                        <td contentEditable="true" onChange={this.handleCellChanged.bind(this, eventContext)}>
-                            {value}
+                        <td >
+                            <input className="input-cell" type="text" value={value} onChange={this.handleCellChanged.bind(this, eventContext)}/>
                         </td>
                     );
                 }
@@ -136,6 +147,7 @@ export class ReactCircleCard extends React.Component<{}, State>{
         const pkColIndex = this.getIndexOfPkCol();
 
         for (let i = 0; i < cols.length; i++) {
+
             if (pkColIndex != i) {
                 const column = cols[i];
 
@@ -155,8 +167,7 @@ export class ReactCircleCard extends React.Component<{}, State>{
         if (this.state.data.columns.length > 0) {
             return (
                 <div>
-                    <div className="flex--justify-between mb-2">
-                        <span className="h2">DBI Magic Table</span>
+                    <div className="flex--justify-right mb-2">
                         <button className="button" onClick={this.handleSaveBtnClick}>Save changes</button>
                     </div>
                     <div className="tableFixHead" style={sizeStyle}>
