@@ -1,4 +1,4 @@
-// CSS RESET   
+/* CSS RESET    */
 
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
@@ -15,13 +15,23 @@ menu, nav, output, ruby, section, summary,
 time, mark, audio, video {
 	margin: 0;
 	padding: 0;
-	border: 0;
-	font-size: 100%;
-	font: inherit;
-	vertical-align: baseline;
+    border: 0;
+    vertical-align: baseline;
+
+    /* Text */
+	font-size: 10pt;
+	font-family: Arial, Helvetica, sans-serif;
 }
 
-// TABLE
+
+
+img {
+    height: 10px;
+    width: 10px;
+}
+
+
+/* TABLE */
 
 .table-scroll { 
     overflow-y: auto; 
@@ -29,48 +39,69 @@ time, mark, audio, video {
 
 table  {
     width: 100%; 
+
+    /* Border */
     border-spacing: 0;
     border-collapse: separate; 
-    border-spacing: 0;
 }
 
-table th:first-child,
-table td:first-child {
-  border-left: 0.5px solid;
-}
 
 th, td { 
-    border-bottom: 0.5px solid;
-    border-right: 0.5px solid;
+    color: #333333;
 }
 
 td {
-    padding: 1px;
+    padding: 0px;
     align-content: center;
+
+    /* Border */
+    border-bottom: 1px solid #eee;
+    border-right: 0.5px solid #ffffff;
+
 }
 
 th { 
-    padding: 8px 16px; 
-    background:#eee; 
-    border-top: 0.5px solid;
+    padding: 5px 7px; 
+    top: 0;
     position: sticky; 
-    top: 0; 
+    
+    /* Text */ 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-weight: bold;
+    font-size: 9pt;
+    text-align: left;
+
+    /* Border */
+    border-bottom: 1px solid #000000;
+
+    /* Colors */
+    background:#ffffff; 
+    color: #000000;
 }
 
+
+
 .input-cell {
-    box-sizing: border-box;
-    border-style: none;
-    border-radius: 0px;
     width: calc(100%);
     height: calc(100% - 11px);
     padding: 5px 7px;
+
+    border-style: none;
+
+    /* Border */
+    border-radius: 0px;
+    box-sizing: border-box;
 }
 
 .input-cell:focus {
-    border-style: none;
+    /* Outline */
     outline-style: none;
-    background-color: #f7a6a6;
+
+    /* Border */
+    border-style: none;
+
+    /* Colors */
+    background-color: #eeeeee;
 }
 
 .flex--justify-between {
@@ -79,41 +110,116 @@ th {
     align-items: center;
 }
 
-// OTHERS
+/* OTHERS */
 
 .button {
     padding: 7px 12px;
-    background-color: #deffd1;
+
+    /* Text */
     font-size: 0.9em;
+
+    /* Border */
     border-radius: 3px;
     border-style: solid;
     border-width: 0.5px;
-    border-color: #9c9c9c;
+
+    /* Colors */
+    background-color:#a7a6a6;
+    border-color: #ffffff;
+    color: #ffffff;
 }
 
 .button:focus {
+    /* Outline */
     outline-style: none;
+
+    /* Border */
+    border-width: thin;
+
+    /* Colors */
+    background-color: #ffffff00;
+    border-color: #a7a6a6;
+    color: #a7a6a6;
 }
 
 .button:active {
-    transform:translateY(2px);
-    background-color: #c0dfb3;
+    
+    /* Colors */
+    background-color:#868686;
+    border-color: #ffffff;
+    color: #ffffff;
 }
+
+.button_add {
+    padding: 7px 12px;
+
+    /* Text */
+    font-size: 0.9em;
+
+    /* Border */
+    border-radius: 3px;
+    border-style: solid;
+    border-width: 0.5px;
+
+    /* Colors */
+    background-color:#bdbdbd;
+    border-color: #ffffff;
+    color: #ffffff;
+}
+
+.button_add:focus {
+    /* Outline */
+    outline-style: none;
+
+    /* Border */
+    border-width: thin;
+
+    /* Colors */
+    background-color: #ffffff00;
+    border-color:#bdbdbd;
+    color: #bdbdbd;
+}
+
+.button_add:active {
+    
+    /* Colors */
+    background-color: #868686;
+    border-color: #ffffff;
+    color: #ffffff;
+}
+
+.button_bin{
+    display: block;
+    margin: auto;
+
+    /* Border */
+    border: 0ch;
+
+    /* Colors */
+    background-color: #ffffff00;
+}
+
+.button_bin:focus {
+    /* Border */
+    border: 0ch;
+
+    /* Colors */
+    background-color: #ffffff00;
+}
+
+.button_bin:active {
+    /* Border */
+    border: 0ch;
+
+    /* Colors */
+    background-color: #ffffff00;
+}
+
 
 .flex--justify-right {
     display: flex;
     justify-content: flex-end;
 }
-
-
-.h1 {
-    font-size: 2em;
-}
-
-.h2 {
-    font-size: 1.8em;
-}
-
 
 .mb-1 {
     margin-bottom: 5px;
@@ -132,6 +238,10 @@ th {
     display: flex;
     align-items: center;
     justify-content: center;
+
+    /* Text */
     font-size: 2em;
+    
+    /* Colors */
     color: #7e1a1a;
 }

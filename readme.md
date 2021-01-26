@@ -4,8 +4,7 @@
 - pbiviz package
 ## todo 
 - logování změněných řádků
-- poslat HTML kostru
 - nový řádek
 - smazat řádek
-
 - text wrap
+- popUp window
