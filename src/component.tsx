@@ -25,6 +25,7 @@ export class ReactCircleCard extends React.Component<{}, State>{
         super(props);
         this.state = initialState;
         this.handleSaveBtnClick = this.handleSaveBtnClick.bind(this);
+        this.handleNewBtnClick = this.handleNewBtnClick.bind(this);
     }
 
     public static update(newState: State) {
@@ -88,6 +89,31 @@ export class ReactCircleCard extends React.Component<{}, State>{
             })
     }
 
+    private handleNewBtnClick(event) {
+        var rows = this.state.data.rows;
+        var cols = this.state.data.columns;
+        var newObj: (string|number)[] = [-1];
+
+        for (let i = 0; i < cols.length; i++) {
+            const col = cols[i];
+            if (col !== "ID") {
+                newObj.push("");
+            }            
+        }
+
+        rows.unshift(newObj);
+        this.setState((prevState => ({
+            data: {
+                columns: prevState.data.columns,
+                rows: rows
+            },
+            size: prevState.size,
+            apiUrl: prevState.apiUrl
+        })));
+
+        console.log(this.state.data.rows);
+    }
+
     private transformBody() {
         var newBody = [];
         const rows = this.state.data.rows;
@@ -111,12 +137,15 @@ export class ReactCircleCard extends React.Component<{}, State>{
         let tableBodyJsx = [];
         const pkColIndex = this.getIndexOfPkCol();
 
+        // pro každou řádku
         for (let i = 0; i < this.state.data.rows.length; i++) {
 
             const row = this.state.data.rows[i];
             let rowsJsx = [];
 
+            // pro každou její buňku
             for (let j = 0; j < colsCount; j++) {
+                // pokud se nejedná o buňku s ID
                 if (pkColIndex != j) {
                     var value = row[j];
 
@@ -167,6 +196,7 @@ export class ReactCircleCard extends React.Component<{}, State>{
             return (
                 <div>
                     <div className="flex--justify-right mb-2">
+                        <button className="button" onClick={this.handleNewBtnClick}>New entry</button>
                         <button className="button" onClick={this.handleSaveBtnClick}>Save changes</button>
                     </div>
                     <div className="table-scroll" style={sizeStyle}>
