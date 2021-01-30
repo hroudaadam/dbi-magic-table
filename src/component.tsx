@@ -1,10 +1,11 @@
-import { values } from "d3";
 import * as React from "react";
+import { Button, Modal } from 'react-bootstrap';
 
 export interface State {
     data,
     size,
-    apiUrl
+    apiUrl,
+    showModal
 }
 
 export const initialState: State = {
@@ -13,7 +14,8 @@ export const initialState: State = {
         rows: []
     },
     size: 200,
-    apiUrl: ""
+    apiUrl: "",
+    showModal: false
 }
 
 export class ReactCircleCard extends React.Component<{}, State>{
@@ -26,6 +28,7 @@ export class ReactCircleCard extends React.Component<{}, State>{
         this.state = initialState;
         this.handleSaveBtnClick = this.handleSaveBtnClick.bind(this);
         this.handleNewBtnClick = this.handleNewBtnClick.bind(this);
+        this.handleOpenCloseModal = this.handleOpenCloseModal.bind(this);
     }
 
     public static update(newState: State) {
@@ -54,15 +57,19 @@ export class ReactCircleCard extends React.Component<{}, State>{
             data: {
                 columns: prevState.data.columns,
                 rows: prevState.data.rows
-            },
-            size: prevState.size,
-            apiUrl: prevState.apiUrl
+            }
         })));
     }
 
     private getIndexOfPkCol() {
         var cols: Array<String> = this.state.data.columns;
         return cols.findIndex(col => col === "ID");
+    }
+
+    private handleOpenCloseModal() {
+        this.setState((prevState => ({
+            showModal: !prevState.showModal
+        })));
     }
 
     private handleSaveBtnClick(event) {
@@ -72,11 +79,11 @@ export class ReactCircleCard extends React.Component<{}, State>{
 
         // var url = "https://prod-140.westeurope.logic.azure.com:443/workflows/101633d73f5447d2b60a837670fdbadc/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=3B_Oq59FZuJVXG8nq3k4pHLgTn64p6i7FlUwTTNQIsw";
         var url = this.state.apiUrl;
-        var body = this.transformBody();
+        var body = JSON.stringify(this.transformBody());
 
         fetch(url, {
             method: "POST",
-            body: JSON.stringify(body)
+            body: body
         })
             .then((resp) => {
                 resp.text();
@@ -86,32 +93,32 @@ export class ReactCircleCard extends React.Component<{}, State>{
             })
             .catch((err) => {
                 console.error("error: " + err);
-            })
+            });
+
+        console.log(body);
+        console.log(url);
     }
 
     private handleNewBtnClick(event) {
         var rows = this.state.data.rows;
         var cols = this.state.data.columns;
-        var newObj: (string|number)[] = [-1];
+        var newObj: (string | number)[] = [-1];
 
         for (let i = 0; i < cols.length; i++) {
             const col = cols[i];
             if (col !== "ID") {
                 newObj.push("");
-            }            
+            }
         }
 
         rows.unshift(newObj);
+
         this.setState((prevState => ({
             data: {
                 columns: prevState.data.columns,
                 rows: rows
             },
-            size: prevState.size,
-            apiUrl: prevState.apiUrl
         })));
-
-        console.log(this.state.data.rows);
     }
 
     private transformBody() {
@@ -210,7 +217,6 @@ export class ReactCircleCard extends React.Component<{}, State>{
                                 {this.renderTableBody()}
                             </tbody>
                         </table>
-
                     </div>
                 </div>
             )

@@ -1,6 +1,6 @@
 "use strict";
 import 'core-js/stable';
-import './../style/visual.less';
+// import './../style/css/bootstrap.min.css';
 import powerbi from 'powerbi-visuals-api';
 import VisualConstructorOptions = powerbi.extensibility.visual.VisualConstructorOptions;
 import VisualUpdateOptions = powerbi.extensibility.visual.VisualUpdateOptions;
@@ -49,7 +49,8 @@ export class Visual implements IVisual {
             ReactCircleCard.update({
                 data: data,
                 size: size,
-                apiUrl: apiUrl
+                apiUrl: apiUrl,
+                showModal: false
             });
         } else {
             this.clear();
