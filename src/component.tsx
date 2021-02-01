@@ -4,6 +4,7 @@ import { Button, Modal } from 'react-bootstrap';
 export interface State {
     data,
     cols,
+    colsTypes,
     pkCol,
     size,
     apiUrl,
@@ -14,6 +15,7 @@ export interface State {
 export const initialState: State = {
     data: [],
     cols: [],
+    colsTypes: [],
     pkCol: null,
     size: 200,
     apiUrl: "",
@@ -43,8 +45,8 @@ export class ReactCircleCard extends React.Component<{}, State>{
     }
 
     public componentWillMount() {
-        ReactCircleCard.updateCallback = (newState: State): void => { 
-            this.setState(newState); 
+        ReactCircleCard.updateCallback = (newState: State): void => {
+            this.setState(newState);
         };
     }
 
@@ -52,7 +54,7 @@ export class ReactCircleCard extends React.Component<{}, State>{
         ReactCircleCard.updateCallback = null;
     }
 
-    // handler pro editování buňky
+    // editování buňky
     private handleCellChanged(eventContext, event) {
         let value = event.target.value;
         let { rowI, col } = eventContext;
@@ -70,32 +72,50 @@ export class ReactCircleCard extends React.Component<{}, State>{
         })));
     }
 
+    // vrací index ID sloupce v poli sloupců
     private getIndexOfPkCol() {
         var cols: Array<String> = this.state.cols;
         return cols.findIndex(col => col === this.state.pkCol);
     }
 
+    // uložení změn
     private handleSaveBtnClick(event) {
         if (this.getIndexOfPkCol() < 0) {
             return;
         }
-        
-        var uniqueEditRowIds = [...new Set(this.state.editedRows)];
-        var data = this.state.data;
+        const data = this.state.data;
+        const cols = this.state.cols;
+        const colsTypes = this.state.colsTypes;
 
-        var bodyObj = [];        
-        data.map(function(row){
+        // získání pouze editovaných řádků
+        var uniqueEditRowIds = [...new Set(this.state.editedRows)];
+        var bodyObj = [];
+        data.map(function (row) {
             if (uniqueEditRowIds.indexOf(row.ID) >= 0) {
                 bodyObj.push(row);
             }
-        });            
-        
+        });
+
+        // formátování pokud pro DateTime
+        // pole indexů sloupců, které jsou typu DateTime
+        let dateTypeIndexes = []; 
+        for (let i = 0; i < colsTypes.length; i++) {
+            const colsType = colsTypes[i];
+            if (colsType === "D") dateTypeIndexes.push(i);
+        }
+        for (let i = 0; i < bodyObj.length; i++) {
+            const row = bodyObj[i];
+            // upravuje pouze sloupce, které jsou DateTime
+            for (let j = 0; j < dateTypeIndexes.length; j++) {
+                const dateTypeIndex = dateTypeIndexes[j];
+                row[cols[dateTypeIndex]] = this.formatDate(row[cols[dateTypeIndex]]);
+            }
+        }
+
         // "https://prod-140.westeurope.logic.azure.com:443/workflows/101633d73f5447d2b60a837670fdbadc/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=3B_Oq59FZuJVXG8nq3k4pHLgTn64p6i7FlUwTTNQIsw";
         var url = this.state.apiUrl;
         var bodyStr = JSON.stringify(bodyObj);
 
-        console.log(bodyObj);
-        
         fetch(url, {
             method: "POST",
             body: bodyStr
@@ -111,11 +131,23 @@ export class ReactCircleCard extends React.Component<{}, State>{
             });
     }
 
+    // formátování DateTime stringu na ISO string
+    private formatDate(rawDate) {
+        let splitDateString = rawDate.split("/");
+        let day = parseInt(splitDateString[0]);
+        let month = parseInt(splitDateString[1]) - 1;
+        let year = parseInt(splitDateString[2]);
+
+        let date = new Date(year, month, day);
+        return date.toISOString();
+    }
+
+    // přidání řádky
     private handleNewBtnClick(event) {
         const data = this.state.data;
         const cols = this.state.cols;
 
-        var newObj = {
+        let newObj = {
             ID: -1
         };
 

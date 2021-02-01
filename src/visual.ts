@@ -35,11 +35,11 @@ export class Visual implements IVisual {
         this.settings = Visual.parseSettings(options && options.dataViews && options.dataViews[0]);
 
         if (options.dataViews && options.dataViews[0]) {
-            const formattedDataview = this.transformDataview(options.dataViews[0]);            
+            const formattedDataview = this.transformDataview(options.dataViews[0]);
             const size = options.viewport.height - 50;
 
             // apiUrl object inic. hodnoty
-            var apiUrl:String = "";
+            var apiUrl: String = "";
             if (options.dataViews[0].metadata.objects) {
                 if (options.dataViews[0].metadata.objects.apiTest.apiUrl) {
                     apiUrl = options.dataViews[0].metadata.objects.apiTest.apiUrl.toString();
@@ -49,6 +49,7 @@ export class Visual implements IVisual {
             ReactCircleCard.update({
                 data: formattedDataview.data,
                 cols: formattedDataview.cols,
+                colsTypes: formattedDataview.colsTypes,
                 pkCol: formattedDataview.pkCol,
                 size: size,
                 apiUrl: apiUrl,
@@ -67,19 +68,41 @@ export class Visual implements IVisual {
 
     public enumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): VisualObjectInstance[] | VisualObjectInstanceEnumerationObject {
         return VisualSettings.enumerateObjectInstances(this.settings || VisualSettings.getDefault(), options);
-    }  
+    }
 
     private transformDataview(dataView) {
         let colsRaw = dataView.table.columns;
         let rows = dataView.table.rows;
-        
+
         // transofrmace sloupců
         let cols = [];
         for (let i = 0; i < colsRaw.length; i++) {
             const column = colsRaw[i];
-            cols.push(column.displayName);     
+            cols.push(column.displayName);
         }
-        
+
+        // získání názvu sloupce s ID
+        let pkCol = null;
+        for (let i = 0; i < colsRaw.length; i++) {
+            const col = colsRaw[i];
+            if (col.roles.id) {
+                pkCol = col.displayName;
+                break;
+            }
+        }
+
+        // získání datových typů sloupců
+        let colsTypes = [];
+        for (let i = 0; i < colsRaw.length; i++) {
+            const col = colsRaw[i];
+            if (col.type.dateTime) {
+                colsTypes.push("D");
+            }
+            else {
+                colsTypes.push("*");
+            }
+        }
+
         // transofrmace řádků
         let data = [];
         for (let i = 0; i < rows.length; i++) {
@@ -88,26 +111,32 @@ export class Visual implements IVisual {
 
             for (let j = 0; j < cols.length; j++) {
                 const col = cols[j];
-                newRowObject[col] = row[j];
+                // pokud je hodnota typu DateTime, pak zparsovat
+                if (colsTypes[j] === "D") {
+                    newRowObject[col] = this.formatDate(row[j]);
+                }
+                // jinak pracovat jako s normální hodnotou
+                else {
+                    newRowObject[col] = row[j];
+                }
             }
-            data.push(newRowObject);            
-        }
-
-        // získání názvu sloupce s ID
-        let pkCol = null;
-        for (let i = 0; i < colsRaw.length; i++) {
-            const col = colsRaw[i];
-            console.log(col.roles.id);
-            if (col.roles.id) {
-                pkCol = col.displayName;
-                break;
-            }
+            data.push(newRowObject);
         }
 
         return {
             cols: cols,
             data: data,
-            pkCol: pkCol
+            pkCol: pkCol,
+            colsTypes: colsTypes
         }
+    }
+
+    private formatDate(rawDate) {
+        var date = new Date(rawDate);
+        var strDay = (date.getDate() < 10 ? "0" : "") + date.getDate();
+        var strMonth = ((date.getMonth() + 1) < 10 ? "0" : "") + (date.getMonth() + 1);
+        var strYear = date.getFullYear();
+        var strDate = strDay + "/" + strMonth + "/" + strYear
+        return strDate;
     }
 }
