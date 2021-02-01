@@ -50,7 +50,8 @@ export class Visual implements IVisual {
                 data: data,
                 size: size,
                 apiUrl: apiUrl,
-                showModal: false
+                showModal: false,
+                editedRows: []
             });
         } else {
             this.clear();

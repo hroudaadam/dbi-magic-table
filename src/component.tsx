@@ -5,7 +5,8 @@ export interface State {
     data,
     size,
     apiUrl,
-    showModal
+    showModal,
+    editedRows
 }
 
 export const initialState: State = {
@@ -15,7 +16,8 @@ export const initialState: State = {
     },
     size: 200,
     apiUrl: "",
-    showModal: false
+    showModal: false,
+    editedRows: []
 }
 
 export class ReactCircleCard extends React.Component<{}, State>{
@@ -35,6 +37,7 @@ export class ReactCircleCard extends React.Component<{}, State>{
         if (typeof ReactCircleCard.updateCallback === 'function') {
             ReactCircleCard.updateCallback(newState);
         }
+        console.log("update");
     }
 
     public componentWillMount() {
@@ -53,11 +56,17 @@ export class ReactCircleCard extends React.Component<{}, State>{
         let rows = this.state.data.rows;
         rows[rowI][colI] = value;
 
+
+        let editedRows = this.state.editedRows;
+        editedRows.push(rows[rowI].ID);
+        console.log(rows[rowI][0]);
+
         this.setState((prevState => ({
             data: {
                 columns: prevState.data.columns,
                 rows: prevState.data.rows
-            }
+            },
+            editedRows: editedRows
         })));
     }
 
@@ -76,6 +85,11 @@ export class ReactCircleCard extends React.Component<{}, State>{
         if (this.getIndexOfPkCol() < 0) {
             return;
         }
+
+        
+        var uniqueRows = [...new Set(this.state.editedRows)];
+        console.log("prdel");
+        console.log(uniqueRows);
 
         // var url = "https://prod-140.westeurope.logic.azure.com:443/workflows/101633d73f5447d2b60a837670fdbadc/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=3B_Oq59FZuJVXG8nq3k4pHLgTn64p6i7FlUwTTNQIsw";
         var url = this.state.apiUrl;

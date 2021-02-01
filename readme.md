@@ -8,3 +8,4 @@
 - smazat řádek
 - text wrap
 - popUp window
+- transformace dat při vytvoření
