@@ -47,11 +47,13 @@ export class Visual implements IVisual {
             }
 
             ReactCircleCard.update({
-                data: data,
+                rawData: data,
+                data: [],
                 size: size,
                 apiUrl: apiUrl,
                 showModal: false,
-                editedRows: []
+                editedRows: [],
+
             });
         } else {
             this.clear();

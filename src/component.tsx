@@ -2,6 +2,7 @@ import * as React from "react";
 import { Button, Modal } from 'react-bootstrap';
 
 export interface State {
+    rawData,
     data,
     size,
     apiUrl,
@@ -10,14 +11,15 @@ export interface State {
 }
 
 export const initialState: State = {
-    data: {
+    rawData: {
         columns: [],
         rows: []
     },
+    data: [],
     size: 200,
     apiUrl: "",
     showModal: false,
-    editedRows: []
+    editedRows: [],
 }
 
 export class ReactCircleCard extends React.Component<{}, State>{
@@ -28,76 +30,75 @@ export class ReactCircleCard extends React.Component<{}, State>{
     constructor(props: any) {
         super(props);
         this.state = initialState;
+
+        // binding
         this.handleSaveBtnClick = this.handleSaveBtnClick.bind(this);
         this.handleNewBtnClick = this.handleNewBtnClick.bind(this);
-        this.handleOpenCloseModal = this.handleOpenCloseModal.bind(this);
     }
 
     public static update(newState: State) {
         if (typeof ReactCircleCard.updateCallback === 'function') {
             ReactCircleCard.updateCallback(newState);
         }
-        console.log("update");
+
     }
 
     public componentWillMount() {
-        ReactCircleCard.updateCallback = (newState: State): void => { this.setState(newState); };
-        this.transformBody();
+        ReactCircleCard.updateCallback = (newState: State): void => { 
+            this.setState(newState); 
+            this.transformBody();
+        };
     }
 
     public componentWillUnmount() {
         ReactCircleCard.updateCallback = null;
     }
 
+    // handler pro editování buňky
     private handleCellChanged(eventContext, event) {
         let value = event.target.value;
-        let { rowI, colI } = eventContext;
+        let { rowI, colKey } = eventContext;
 
-        let rows = this.state.data.rows;
-        rows[rowI][colI] = value;
-
+        let data = this.state.data;
+        let editRow = data[rowI];
+        data[rowI][colKey] = value;
 
         let editedRows = this.state.editedRows;
-        editedRows.push(rows[rowI].ID);
-        console.log(rows[rowI][0]);
+        editedRows.push(editRow.ID);
 
         this.setState((prevState => ({
-            data: {
-                columns: prevState.data.columns,
-                rows: prevState.data.rows
-            },
+            data: data,
             editedRows: editedRows
         })));
     }
 
     private getIndexOfPkCol() {
-        var cols: Array<String> = this.state.data.columns;
+        var cols: Array<String> = this.state.rawData.columns;
         return cols.findIndex(col => col === "ID");
-    }
-
-    private handleOpenCloseModal() {
-        this.setState((prevState => ({
-            showModal: !prevState.showModal
-        })));
     }
 
     private handleSaveBtnClick(event) {
         if (this.getIndexOfPkCol() < 0) {
             return;
         }
-
         
-        var uniqueRows = [...new Set(this.state.editedRows)];
-        console.log("prdel");
-        console.log(uniqueRows);
+        var uniqueEditRowIds = [...new Set(this.state.editedRows)];
+        var data = this.state.data;
 
-        // var url = "https://prod-140.westeurope.logic.azure.com:443/workflows/101633d73f5447d2b60a837670fdbadc/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=3B_Oq59FZuJVXG8nq3k4pHLgTn64p6i7FlUwTTNQIsw";
+        var bodyObj = [];        
+        data.map(function(row){
+            if (uniqueEditRowIds.indexOf(row.ID) >= 0) {
+                bodyObj.push(row);
+            }
+        });            
+        
+        // "https://prod-140.westeurope.logic.azure.com:443/workflows/101633d73f5447d2b60a837670fdbadc/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=3B_Oq59FZuJVXG8nq3k4pHLgTn64p6i7FlUwTTNQIsw";
         var url = this.state.apiUrl;
-        var body = JSON.stringify(this.transformBody());
-
+        var bodyStr = JSON.stringify(bodyObj);
+        
         fetch(url, {
             method: "POST",
-            body: body
+            body: bodyStr
         })
             .then((resp) => {
                 resp.text();
@@ -108,14 +109,11 @@ export class ReactCircleCard extends React.Component<{}, State>{
             .catch((err) => {
                 console.error("error: " + err);
             });
-
-        console.log(body);
-        console.log(url);
     }
 
     private handleNewBtnClick(event) {
-        var rows = this.state.data.rows;
-        var cols = this.state.data.columns;
+        var rows = this.state.rawData.rows;
+        var cols = this.state.rawData.columns;
         var newObj: (string | number)[] = [-1];
 
         for (let i = 0; i < cols.length; i++) {
@@ -128,49 +126,53 @@ export class ReactCircleCard extends React.Component<{}, State>{
         rows.unshift(newObj);
 
         this.setState((prevState => ({
-            data: {
-                columns: prevState.data.columns,
+            rawData: {
+                columns: prevState.rawData.columns,
                 rows: rows
             },
         })));
     }
 
     private transformBody() {
-        var newBody = [];
-        const rows = this.state.data.rows;
-        const cols = this.state.data.columns;
+        var formattedData = [];
+        const rows = this.state.rawData.rows;
+        const cols = this.state.rawData.columns;
 
         for (let i = 0; i < rows.length; i++) {
             const row = rows[i];
-            let newObjectRow = {};
+            let newRowObject = {};
 
             for (let j = 0; j < cols.length; j++) {
                 const col = cols[j];
-                newObjectRow[col] = row[j];
+                newRowObject[col] = row[j];
             }
-            newBody.push(newObjectRow);
+            formattedData.push(newRowObject);
         }
-        return newBody;
+        
+        this.setState({
+            data: formattedData
+        });  
     }
 
     private renderTableBody() {
-        const colsCount = this.state.data.columns.length;
+        const colsCount = this.state.rawData.columns.length;
         let tableBodyJsx = [];
         const pkColIndex = this.getIndexOfPkCol();
 
         // pro každou řádku
-        for (let i = 0; i < this.state.data.rows.length; i++) {
+        for (let i = 0; i < this.state.data.length; i++) {
 
-            const row = this.state.data.rows[i];
+            const row = this.state.data[i];
             let rowsJsx = [];
 
             // pro každou její buňku
             for (let j = 0; j < colsCount; j++) {
                 // pokud se nejedná o buňku s ID
                 if (pkColIndex != j) {
-                    var value = row[j];
+                    var colKey = Object.keys(row)[j];
+                    var value = row[colKey];
 
-                    const eventContext = { rowI: i, colI: j };
+                    const eventContext = { rowI: i, colKey: colKey };
 
                     rowsJsx.push(
                         <td >
@@ -192,7 +194,7 @@ export class ReactCircleCard extends React.Component<{}, State>{
 
     private renderTableHeader() {
         let tableHeaderJsx = [];
-        const cols = this.state.data.columns;
+        const cols = this.state.rawData.columns;
         const pkColIndex = this.getIndexOfPkCol();
 
         for (let i = 0; i < cols.length; i++) {
@@ -213,7 +215,7 @@ export class ReactCircleCard extends React.Component<{}, State>{
     render() {
         const sizeStyle = { height: this.state.size };
 
-        if (this.state.data.columns.length > 0) {
+        if (this.state.rawData.columns.length > 0) {
             return (
                 <div>
                     <div className="flex--justify-right mb-2">
