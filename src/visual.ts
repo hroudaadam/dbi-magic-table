@@ -35,10 +35,10 @@ export class Visual implements IVisual {
         this.settings = Visual.parseSettings(options && options.dataViews && options.dataViews[0]);
 
         if (options.dataViews && options.dataViews[0]) {
-            const dataView: DataView = options.dataViews[0];
-            const data = this.transformData(dataView);            
+            const formattedDataview = this.transformDataview(options.dataViews[0]);            
             const size = options.viewport.height - 50;
 
+            // apiUrl object inic. hodnoty
             var apiUrl:String = "";
             if (options.dataViews[0].metadata.objects) {
                 if (options.dataViews[0].metadata.objects.apiTest.apiUrl) {
@@ -47,8 +47,9 @@ export class Visual implements IVisual {
             }
 
             ReactCircleCard.update({
-                rawData: data,
-                data: [],
+                data: formattedDataview.data,
+                cols: formattedDataview.cols,
+                pkCol: formattedDataview.pkCol,
                 size: size,
                 apiUrl: apiUrl,
                 showModal: false,
@@ -56,7 +57,7 @@ export class Visual implements IVisual {
 
             });
         } else {
-            this.clear();
+            ReactCircleCard.update(initialState);
         }
     }
 
@@ -68,21 +69,45 @@ export class Visual implements IVisual {
         return VisualSettings.enumerateObjectInstances(this.settings || VisualSettings.getDefault(), options);
     }  
 
-    private transformData(dataView) {
-        let columnsRaw = dataView.table.columns;
-        let columns = [];
-        for (let i = 0; i < columnsRaw.length; i++) {
-            const column = columnsRaw[i];
-            columns.push(column.displayName);     
+    private transformDataview(dataView) {
+        let colsRaw = dataView.table.columns;
+        let rows = dataView.table.rows;
+        
+        // transofrmace sloupců
+        let cols = [];
+        for (let i = 0; i < colsRaw.length; i++) {
+            const column = colsRaw[i];
+            cols.push(column.displayName);     
+        }
+        
+        // transofrmace řádků
+        let data = [];
+        for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            let newRowObject = {};
+
+            for (let j = 0; j < cols.length; j++) {
+                const col = cols[j];
+                newRowObject[col] = row[j];
+            }
+            data.push(newRowObject);            
+        }
+
+        // získání názvu sloupce s ID
+        let pkCol = null;
+        for (let i = 0; i < colsRaw.length; i++) {
+            const col = colsRaw[i];
+            console.log(col.roles.id);
+            if (col.roles.id) {
+                pkCol = col.displayName;
+                break;
+            }
         }
 
         return {
-            columns: columns,
-            rows: dataView.table.rows
+            cols: cols,
+            data: data,
+            pkCol: pkCol
         }
-    }
-
-    private clear() {
-        ReactCircleCard.update(initialState);
     }
 }

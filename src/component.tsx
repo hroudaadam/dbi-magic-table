@@ -2,8 +2,9 @@ import * as React from "react";
 import { Button, Modal } from 'react-bootstrap';
 
 export interface State {
-    rawData,
     data,
+    cols,
+    pkCol,
     size,
     apiUrl,
     showModal,
@@ -11,11 +12,9 @@ export interface State {
 }
 
 export const initialState: State = {
-    rawData: {
-        columns: [],
-        rows: []
-    },
     data: [],
+    cols: [],
+    pkCol: null,
     size: 200,
     apiUrl: "",
     showModal: false,
@@ -46,7 +45,6 @@ export class ReactCircleCard extends React.Component<{}, State>{
     public componentWillMount() {
         ReactCircleCard.updateCallback = (newState: State): void => { 
             this.setState(newState); 
-            this.transformBody();
         };
     }
 
@@ -57,11 +55,11 @@ export class ReactCircleCard extends React.Component<{}, State>{
     // handler pro editování buňky
     private handleCellChanged(eventContext, event) {
         let value = event.target.value;
-        let { rowI, colKey } = eventContext;
+        let { rowI, col } = eventContext;
 
         let data = this.state.data;
         let editRow = data[rowI];
-        data[rowI][colKey] = value;
+        editRow[col] = value;
 
         let editedRows = this.state.editedRows;
         editedRows.push(editRow.ID);
@@ -73,8 +71,8 @@ export class ReactCircleCard extends React.Component<{}, State>{
     }
 
     private getIndexOfPkCol() {
-        var cols: Array<String> = this.state.rawData.columns;
-        return cols.findIndex(col => col === "ID");
+        var cols: Array<String> = this.state.cols;
+        return cols.findIndex(col => col === this.state.pkCol);
     }
 
     private handleSaveBtnClick(event) {
@@ -95,6 +93,8 @@ export class ReactCircleCard extends React.Component<{}, State>{
         // "https://prod-140.westeurope.logic.azure.com:443/workflows/101633d73f5447d2b60a837670fdbadc/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=3B_Oq59FZuJVXG8nq3k4pHLgTn64p6i7FlUwTTNQIsw";
         var url = this.state.apiUrl;
         var bodyStr = JSON.stringify(bodyObj);
+
+        console.log(bodyObj);
         
         fetch(url, {
             method: "POST",
@@ -112,8 +112,8 @@ export class ReactCircleCard extends React.Component<{}, State>{
     }
 
     private handleNewBtnClick(event) {
-        var data = this.state.data;
-        var cols = this.state.rawData.columns;
+        const data = this.state.data;
+        const cols = this.state.cols;
 
         var newObj = {
             ID: -1
@@ -121,7 +121,7 @@ export class ReactCircleCard extends React.Component<{}, State>{
 
         for (let i = 0; i < cols.length; i++) {
             const col = cols[i];
-            if (col !== "ID") {
+            if (col !== this.state.pkCol) {
                 newObj[col] = "";
             }
         }
@@ -133,46 +133,26 @@ export class ReactCircleCard extends React.Component<{}, State>{
         })));
     }
 
-    private transformBody() {
-        var formattedData = [];
-        const rows = this.state.rawData.rows;
-        const cols = this.state.rawData.columns;
-
-        for (let i = 0; i < rows.length; i++) {
-            const row = rows[i];
-            let newRowObject = {};
-
-            for (let j = 0; j < cols.length; j++) {
-                const col = cols[j];
-                newRowObject[col] = row[j];
-            }
-            formattedData.push(newRowObject);
-        }
-        
-        this.setState({
-            data: formattedData
-        });  
-    }
-
     private renderTableBody() {
-        const colsCount = this.state.rawData.columns.length;
-        let tableBodyJsx = [];
+        let cols = this.state.cols;
+        let data = this.state.data;
         const pkColIndex = this.getIndexOfPkCol();
+        let tableBodyJsx = [];
 
         // pro každou řádku
-        for (let i = 0; i < this.state.data.length; i++) {
+        for (let i = 0; i < data.length; i++) {
 
-            const row = this.state.data[i];
+            const row = data[i];
             let rowsJsx = [];
 
             // pro každou její buňku
-            for (let j = 0; j < colsCount; j++) {
+            for (let j = 0; j < cols.length; j++) {
                 // pokud se nejedná o buňku s ID
                 if (pkColIndex != j) {
-                    var colKey = Object.keys(row)[j];
-                    var value = row[colKey];
+                    var col = cols[j];
+                    var value = row[col];
 
-                    const eventContext = { rowI: i, colKey: colKey };
+                    const eventContext = { rowI: i, col: col };
 
                     rowsJsx.push(
                         <td >
@@ -180,7 +160,6 @@ export class ReactCircleCard extends React.Component<{}, State>{
                         </td>
                     );
                 }
-
             }
 
             tableBodyJsx.push(
@@ -194,7 +173,7 @@ export class ReactCircleCard extends React.Component<{}, State>{
 
     private renderTableHeader() {
         let tableHeaderJsx = [];
-        const cols = this.state.rawData.columns;
+        const cols = this.state.cols;
         const pkColIndex = this.getIndexOfPkCol();
 
         for (let i = 0; i < cols.length; i++) {
@@ -206,7 +185,6 @@ export class ReactCircleCard extends React.Component<{}, State>{
                     <th>{column}</th>
                 )
             }
-
         }
         return tableHeaderJsx;
     }
@@ -214,8 +192,9 @@ export class ReactCircleCard extends React.Component<{}, State>{
 
     render() {
         const sizeStyle = { height: this.state.size };
+        const cols = this.state.cols;
 
-        if (this.state.rawData.columns.length > 0) {
+        if (cols.length > 0) {
             return (
                 <div>
                     <div className="flex--justify-right mb-2">
@@ -237,14 +216,9 @@ export class ReactCircleCard extends React.Component<{}, State>{
                 </div>
             )
         }
-        else {
-            return (
-                <div className="error-block">
-                    <span>Nejsou k dispozici žádná data</span>
-                </div>
-            )
-        }
-
+        return (
+            <div></div>
+        )
     }
 }
 
