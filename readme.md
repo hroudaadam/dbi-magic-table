@@ -5,3 +5,4 @@
 ## todo 
 - smazat řádek
 - text wrap
+- formát date timu

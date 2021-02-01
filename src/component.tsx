@@ -112,24 +112,24 @@ export class ReactCircleCard extends React.Component<{}, State>{
     }
 
     private handleNewBtnClick(event) {
-        var rows = this.state.rawData.rows;
+        var data = this.state.data;
         var cols = this.state.rawData.columns;
-        var newObj: (string | number)[] = [-1];
+
+        var newObj = {
+            ID: -1
+        };
 
         for (let i = 0; i < cols.length; i++) {
             const col = cols[i];
             if (col !== "ID") {
-                newObj.push("");
+                newObj[col] = "";
             }
         }
 
-        rows.unshift(newObj);
+        data.unshift(newObj);
 
         this.setState((prevState => ({
-            rawData: {
-                columns: prevState.rawData.columns,
-                rows: rows
-            },
+            data: data
         })));
     }
 
