@@ -1,17 +1,6 @@
-import * as React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import TextField from '@material-ui/core/TextField';
-import TableSortLabel from '@material-ui/core/TableSortLabel';
+import * as React from "react";
 import Button from '@material-ui/core/Button';
-import Box  from '@material-ui/core/Box';
-import Input from '@material-ui/core/Input'
-import Paper from '@material-ui/core/Paper';
+import EnhancedTable from './table';
 
 export interface State {
     data,
@@ -110,7 +99,7 @@ export class ReactCircleCard extends React.Component<{}, State>{
 
         // formátování pokud pro DateTime
         // pole indexů sloupců, které jsou typu DateTime
-        let dateTypeIndexes = [];
+        let dateTypeIndexes = []; 
         for (let i = 0; i < colsTypes.length; i++) {
             const colsType = colsTypes[i];
             if (colsType === "D") dateTypeIndexes.push(i);
@@ -201,17 +190,17 @@ export class ReactCircleCard extends React.Component<{}, State>{
                     const eventContext = { rowI: i, col: col };
 
                     rowsJsx.push(
-                        <TableCell >
-                            <Input disableUnderline={true} multiline={true} value={value} onChange={this.handleCellChanged.bind(this, eventContext)} />
-                        </TableCell>
+                        <td >
+                            <input className="input-cell" type="text" value={value} onChange={this.handleCellChanged.bind(this, eventContext)} />
+                        </td>
                     );
                 }
             }
 
             tableBodyJsx.push(
-                <TableRow key={"row-" + i}>
+                <tr key={"row-" + i}>
                     {rowsJsx}
-                </TableRow>
+                </tr>
             );
         }
         return tableBodyJsx;
@@ -228,19 +217,7 @@ export class ReactCircleCard extends React.Component<{}, State>{
                 const column = cols[i];
 
                 tableHeaderJsx.push(
-                    // <TableCell>{column}</TableCell>
-                    <TableCell
-                        key={i}
-                        // padding={headCell.disablePadding ? 'none' : 'default'}
-                        sortDirection={'asc'}
-                    >
-                        <TableSortLabel
-                            active={true}
-                            direction={'asc'}
-                        >
-                            {column}
-                        </TableSortLabel>
-                    </TableCell>
+                    <th>{column}</th>
                 )
             }
         }
@@ -256,28 +233,23 @@ export class ReactCircleCard extends React.Component<{}, State>{
             return (
                 <div>
                     <div className="flex--justify-right mb-2">
-                        <Box mr={1}>
-                            <Button size="small" disableElevation variant="contained" onClick={this.handleNewBtnClick}>Add</Button>
-                        </Box>
-                        <Box mr={1}>
-                            <Button size="small" disableElevation variant="contained">Delete</Button>
-                        </Box>
-                        <Box>
-                            <Button size="small" disableElevation variant="contained" onClick={this.handleSaveBtnClick}>Save</Button>
-                        </Box>
+                        <button className="button" onClick={this.handleNewBtnClick}>Add</button>
+                        <button className="button">Delete</button>
+                        <button className="button" onClick={this.handleSaveBtnClick}>Save</button>
                     </div>
-                    <TableContainer component={Paper}>
-                        <Table size="small">
-                            <TableHead>
-                                <TableRow>
+                    <div className="table-scroll" style={sizeStyle}>
+                        <table>
+                            <thead>
+                                <tr>
                                     {this.renderTableHeader()}
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
+                                </tr>
+                            </thead>
+                            <tbody>
                                 {this.renderTableBody()}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
+                            </tbody>
+                        </table>
+                    </div>
+                    <EnhancedTable></EnhancedTable>
                 </div>
             )
         }

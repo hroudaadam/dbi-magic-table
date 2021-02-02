@@ -17,6 +17,7 @@ import { ReactCircleCard, initialState } from "./component";
 import IViewport = powerbi.IViewport;
 
 import "./../style/visual.less";
+import 'fontsource-roboto';
 
 export class Visual implements IVisual {
     private target: HTMLElement;
