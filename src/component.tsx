@@ -115,6 +115,7 @@ export class ReactCircleCard extends React.Component<{}, State>{
         // "https://prod-140.westeurope.logic.azure.com:443/workflows/101633d73f5447d2b60a837670fdbadc/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=3B_Oq59FZuJVXG8nq3k4pHLgTn64p6i7FlUwTTNQIsw";
         var url = this.state.apiUrl;
         var bodyStr = JSON.stringify(bodyObj);
+        console.log(bodyStr);
 
         fetch(url, {
             method: "POST",
@@ -139,6 +140,7 @@ export class ReactCircleCard extends React.Component<{}, State>{
         let year = parseInt(splitDateString[2]);
 
         let date = new Date(year, month, day);
+        date.setHours(date.getHours() + 1);
         return date.toISOString();
     }
 
@@ -230,8 +232,9 @@ export class ReactCircleCard extends React.Component<{}, State>{
             return (
                 <div>
                     <div className="flex--justify-right mb-2">
-                        <button className="button" onClick={this.handleNewBtnClick}>New entry</button>
-                        <button className="button" onClick={this.handleSaveBtnClick}>Save changes</button>
+                        <button className="button" onClick={this.handleNewBtnClick}>Add</button>
+                        <button className="button">Delete</button>
+                        <button className="button" onClick={this.handleSaveBtnClick}>Save</button>
                     </div>
                     <div className="table-scroll" style={sizeStyle}>
                         <table>

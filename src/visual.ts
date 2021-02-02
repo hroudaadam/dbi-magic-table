@@ -133,10 +133,13 @@ export class Visual implements IVisual {
 
     private formatDate(rawDate) {
         var date = new Date(rawDate);
-        var strDay = (date.getDate() < 10 ? "0" : "") + date.getDate();
-        var strMonth = ((date.getMonth() + 1) < 10 ? "0" : "") + (date.getMonth() + 1);
-        var strYear = date.getFullYear();
+        date.setDate(date.getDate() + 1);
+
+        var strDay = (date.getUTCDate() < 10 ? "0" : "") + date.getUTCDate();
+        var strMonth = ((date.getUTCMonth() + 1) < 10 ? "0" : "") + (date.getUTCMonth() + 1);
+        var strYear = date.getUTCFullYear();
         var strDate = strDay + "/" + strMonth + "/" + strYear
+
         return strDate;
     }
 }
