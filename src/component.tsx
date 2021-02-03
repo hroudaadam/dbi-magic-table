@@ -9,19 +9,23 @@ import TableRow from '@material-ui/core/TableRow';
 import TextField from '@material-ui/core/TextField';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
 import Button from '@material-ui/core/Button';
-import Box  from '@material-ui/core/Box';
+import Box from '@material-ui/core/Box';
 import Input from '@material-ui/core/Input'
 import Paper from '@material-ui/core/Paper';
+import IconButton from '@material-ui/core/IconButton';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 export interface State {
     data,
     cols,
     colsTypes,
     pkCol,
+    delColIndex,
     size,
     apiUrl,
     showModal,
-    editedRows
+    editedRows,
+    delButtVis
 }
 
 export const initialState: State = {
@@ -29,10 +33,12 @@ export const initialState: State = {
     cols: [],
     colsTypes: [],
     pkCol: null,
+    delColIndex: null,
     size: 200,
     apiUrl: "",
     showModal: false,
     editedRows: [],
+    delButtVis: false
 }
 
 export class ReactCircleCard extends React.Component<{}, State>{
@@ -47,6 +53,7 @@ export class ReactCircleCard extends React.Component<{}, State>{
         // binding
         this.handleSaveBtnClick = this.handleSaveBtnClick.bind(this);
         this.handleNewBtnClick = this.handleNewBtnClick.bind(this);
+        this.handleDelBtnClick = this.handleDelBtnClick.bind(this);
     }
 
     public static update(newState: State) {
@@ -144,6 +151,27 @@ export class ReactCircleCard extends React.Component<{}, State>{
             });
     }
 
+    private handleDelBtnClick(event) {
+        this.setState((prevState => ({
+            delButtVis: !prevState.delButtVis
+        })));
+    }
+
+    // smazání řádky
+    private handleDelRowBtnClick(rowIndex, event) {
+        let data = this.state.data;
+        let deleteRow = data[rowIndex];
+        deleteRow["DEL"] = true;
+
+        let editedRows = this.state.editedRows;
+        editedRows.push(deleteRow.ID);
+
+        this.setState((prevState => ({
+            data: data,
+            editedRows: editedRows
+        })));
+    }
+
     // formátování DateTime stringu na ISO string
     private formatDate(rawDate) {
         let splitDateString = rawDate.split("/");
@@ -162,8 +190,9 @@ export class ReactCircleCard extends React.Component<{}, State>{
         const cols = this.state.cols;
 
         let newObj = {
-            ID: -1
         };
+
+        newObj[this.state.pkCol] = -1
 
         for (let i = 0; i < cols.length; i++) {
             const col = cols[i];
@@ -183,6 +212,7 @@ export class ReactCircleCard extends React.Component<{}, State>{
         let cols = this.state.cols;
         let data = this.state.data;
         const pkColIndex = this.getIndexOfPkCol();
+        const delColIndex = this.state.delColIndex;
         let tableBodyJsx = [];
 
         // pro každou řádku
@@ -191,10 +221,26 @@ export class ReactCircleCard extends React.Component<{}, State>{
             const row = data[i];
             let rowsJsx = [];
 
+            // skrýt pokud je smazaný
+            if (row["DEL"]) {
+                continue;
+            }
+
+            // buňka pro talčítko smazání
+            if (this.state.delButtVis) {
+                rowsJsx.push(
+                    <TableCell padding="none">
+                        <IconButton>
+                            <DeleteIcon fontSize="small" onClick={this.handleDelRowBtnClick.bind(this, i)} />
+                        </IconButton>
+                    </TableCell>
+                );
+            }
+
             // pro každou její buňku
             for (let j = 0; j < cols.length; j++) {
                 // pokud se nejedná o buňku s ID
-                if (pkColIndex != j) {
+                if (j != pkColIndex && j != delColIndex) {
                     var col = cols[j];
                     var value = row[col];
 
@@ -221,25 +267,31 @@ export class ReactCircleCard extends React.Component<{}, State>{
         let tableHeaderJsx = [];
         const cols = this.state.cols;
         const pkColIndex = this.getIndexOfPkCol();
+        const delColIndex = this.state.delColIndex;
 
+        // sloupec na mazání
+
+        if (this.state.delButtVis) {
+            tableHeaderJsx.push(
+                <TableCell
+                    key={-1}
+                >
+                    {""}
+                </TableCell>
+            )
+        }
+
+        // ostatní sloupce
         for (let i = 0; i < cols.length; i++) {
 
-            if (pkColIndex != i) {
+            if (i != pkColIndex && i != delColIndex) {
                 const column = cols[i];
 
                 tableHeaderJsx.push(
-                    // <TableCell>{column}</TableCell>
                     <TableCell
                         key={i}
-                        // padding={headCell.disablePadding ? 'none' : 'default'}
-                        sortDirection={'asc'}
                     >
-                        <TableSortLabel
-                            active={true}
-                            direction={'asc'}
-                        >
-                            {column}
-                        </TableSortLabel>
+                        {column}
                     </TableCell>
                 )
             }
@@ -251,38 +303,34 @@ export class ReactCircleCard extends React.Component<{}, State>{
     render() {
         const sizeStyle = { height: this.state.size };
         const cols = this.state.cols;
+        const delButtonText = this.state.delButtVis ? "Hide" : "Delete";
 
-        if (cols.length > 0) {
-            return (
-                <div>
-                    <div className="flex--justify-right mb-2">
-                        <Box mr={1}>
-                            <Button size="small" disableElevation variant="contained" onClick={this.handleNewBtnClick}>Add</Button>
-                        </Box>
-                        <Box mr={1}>
-                            <Button size="small" disableElevation variant="contained">Delete</Button>
-                        </Box>
-                        <Box>
-                            <Button size="small" disableElevation variant="contained" onClick={this.handleSaveBtnClick}>Save</Button>
-                        </Box>
-                    </div>
-                    <TableContainer component={Paper}>
-                        <Table size="small">
-                            <TableHead>
-                                <TableRow>
-                                    {this.renderTableHeader()}
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {this.renderTableBody()}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                </div>
-            )
-        }
         return (
-            <div></div>
+            <div>
+                <div className="flex--justify-right mb-2">
+                    <Box mr={1}>
+                        <Button size="small" disableElevation variant="contained" onClick={this.handleNewBtnClick}>Add</Button>
+                    </Box>
+                    <Box mr={1}>
+                        <Button size="small" disableElevation variant="contained" onClick={this.handleDelBtnClick}>{delButtonText}</Button>
+                    </Box>
+                    <Box>
+                        <Button size="small" disableElevation variant="contained" onClick={this.handleSaveBtnClick}>Save</Button>
+                    </Box>
+                </div>
+                <TableContainer component={Paper} style={sizeStyle}>
+                    <Table stickyHeader size="small" aria-label="a dense table">
+                        <TableHead>
+                            <TableRow>
+                                {this.renderTableHeader()}
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {this.renderTableBody()}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </div>
         )
     }
 }

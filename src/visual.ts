@@ -52,11 +52,12 @@ export class Visual implements IVisual {
                 cols: formattedDataview.cols,
                 colsTypes: formattedDataview.colsTypes,
                 pkCol: formattedDataview.pkCol,
+                delColIndex: formattedDataview.delColIndex,
                 size: size,
                 apiUrl: apiUrl,
                 showModal: false,
                 editedRows: [],
-
+                delButtVis: false
             });
         } else {
             ReactCircleCard.update(initialState);
@@ -74,23 +75,21 @@ export class Visual implements IVisual {
     private transformDataview(dataView) {
         let colsRaw = dataView.table.columns;
         let rows = dataView.table.rows;
+        const delColName = "DEL";
 
         // transofrmace sloupců
         let cols = [];
         for (let i = 0; i < colsRaw.length; i++) {
             const column = colsRaw[i];
             cols.push(column.displayName);
-        }
+        }        
+        // pomocný sploupec na mazání dat
+        cols.push(delColName);
+        let delColIndex = cols.length - 1;
 
         // získání názvu sloupce s ID
-        let pkCol = null;
-        for (let i = 0; i < colsRaw.length; i++) {
-            const col = colsRaw[i];
-            if (col.roles.id) {
-                pkCol = col.displayName;
-                break;
-            }
-        }
+        let pkCol = colsRaw.find(col => col.roles.id);
+        pkCol = pkCol.displayName;
 
         // získání datových typů sloupců
         let colsTypes = [];
@@ -103,6 +102,8 @@ export class Visual implements IVisual {
                 colsTypes.push("*");
             }
         }
+        // pomocný sloupec na mazání dat
+        colsTypes.push("*");
 
         // transofrmace řádků
         let data = [];
@@ -121,13 +122,24 @@ export class Visual implements IVisual {
                     newRowObject[col] = row[j];
                 }
             }
+            // pomocný sloupec na mazání dat
+            newRowObject[delColName] = false;
+
             data.push(newRowObject);
         }
+
+        // seřazení řádků podle ID
+        data.sort(function(a, b) { 
+            return b[pkCol] - a[pkCol];
+          });
+
+        console.log(data);
 
         return {
             cols: cols,
             data: data,
             pkCol: pkCol,
+            delColIndex: delColIndex,
             colsTypes: colsTypes
         }
     }
