@@ -174,14 +174,17 @@ export class ReactCircleCard extends React.Component<{}, State>{
 
     // formátování DateTime stringu na ISO string
     private formatDate(rawDate) {
-        let splitDateString = rawDate.split("/");
-        let day = parseInt(splitDateString[0]);
-        let month = parseInt(splitDateString[1]) - 1;
-        let year = parseInt(splitDateString[2]);
-
-        let date = new Date(year, month, day);
-        date.setHours(date.getHours() + 1);
-        return date.toISOString();
+        if (rawDate) {
+            let splitDateString = rawDate.split("/");
+            let day = parseInt(splitDateString[0]);
+            let month = parseInt(splitDateString[1]) - 1;
+            let year = parseInt(splitDateString[2]);
+    
+            let date = new Date(year, month, day);
+            date.setHours(date.getHours() + 1);
+            return date.toISOString();
+        }
+        return "";
     }
 
     // přidání řádky
@@ -192,7 +195,8 @@ export class ReactCircleCard extends React.Component<{}, State>{
         let newObj = {
         };
 
-        newObj[this.state.pkCol] = -1
+        newObj[this.state.pkCol] = -1;
+        newObj["DEL"] = false;
 
         for (let i = 0; i < cols.length; i++) {
             const col = cols[i];
