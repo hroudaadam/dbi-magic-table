@@ -1,7 +1,8 @@
 node_modules
-package-lock.json
 dist
-
+package-lock.json
+webpack.statistics.prod.html
+webpack.statistics.dev.html
 test_data
 .vscode
 .tmp
