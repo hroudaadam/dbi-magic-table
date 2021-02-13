@@ -39,7 +39,6 @@ export class Visual implements IVisual {
             const formattedDataview = this.transformDataview(options.dataViews[0]);
             const size = options.viewport.height - 50;
 
-            // apiUrl object inic. hodnoty
             var apiUrl: String = "";
             if (options.dataViews[0].metadata.objects) {
                 if (options.dataViews[0].metadata.objects.apiTest.apiUrl) {
@@ -77,21 +76,22 @@ export class Visual implements IVisual {
         let rows = dataView.table.rows;
         const delColName = "DEL";
 
-        // transofrmace sloupců
+        // column transformation
         let cols = [];
         for (let i = 0; i < colsRaw.length; i++) {
             const column = colsRaw[i];
             cols.push(column.displayName);
         }        
-        // pomocný sploupec na mazání dat
+
+        // helper column for delete
         cols.push(delColName);
         let delColIndex = cols.length - 1;
 
-        // získání názvu sloupce s ID
+        // get name of column containing ID
         let pkCol = colsRaw.find(col => col.roles.id);
         pkCol = pkCol.displayName;
 
-        // získání datových typů sloupců
+        // get data type of columns
         let colsTypes = [];
         for (let i = 0; i < colsRaw.length; i++) {
             const col = colsRaw[i];
@@ -102,10 +102,10 @@ export class Visual implements IVisual {
                 colsTypes.push("*");
             }
         }
-        // pomocný sloupec na mazání dat
+        // helper column data type for delete
         colsTypes.push("*");
 
-        // transofrmace řádků
+        // transform rows
         let data = [];
         for (let i = 0; i < rows.length; i++) {
             const row = rows[i];
@@ -113,27 +113,25 @@ export class Visual implements IVisual {
 
             for (let j = 0; j < cols.length; j++) {
                 const col = cols[j];
-                // pokud je hodnota typu DateTime, pak zparsovat
+                // if value is datetime then parse
                 if (colsTypes[j] === "D") {
                     newRowObject[col] = this.formatDate(row[j]);
                 }
-                // jinak pracovat jako s normální hodnotou
+                // else normal value
                 else {
                     newRowObject[col] = row[j];
                 }
             }
-            // pomocný sloupec na mazání dat
+            // helper column for delete - bool if the row was deleted
             newRowObject[delColName] = false;
 
             data.push(newRowObject);
         }
 
-        // seřazení řádků podle ID
+        // sort rows - ID
         data.sort(function(a, b) { 
             return b[pkCol] - a[pkCol];
           });
-
-        console.log(data);
 
         return {
             cols: cols,

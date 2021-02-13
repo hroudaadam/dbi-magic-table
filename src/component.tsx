@@ -70,7 +70,7 @@ export class ReactCircleCard extends React.Component<{}, State>{
         ReactCircleCard.updateCallback = null;
     }
 
-    // editování buňky
+    // cell edit value
     private handleCellChanged(eventContext, event) {
         let value = event.target.value;
         let { rowI, col } = eventContext;
@@ -88,13 +88,13 @@ export class ReactCircleCard extends React.Component<{}, State>{
         })));
     }
 
-    // vrací index ID sloupce v poli sloupců
+    // returns index of ID column in columns array
     private getIndexOfPkCol() {
         var cols: Array<String> = this.state.cols;
         return cols.findIndex(col => col === this.state.pkCol);
     }
 
-    // uložení změn
+    // save changes
     private handleSaveBtnClick(event) {
         if (this.getIndexOfPkCol() < 0) {
             return;
@@ -103,7 +103,7 @@ export class ReactCircleCard extends React.Component<{}, State>{
         const cols = this.state.cols;
         const colsTypes = this.state.colsTypes;
 
-        // získání pouze editovaných řádků
+        // getting only edited rows
         var uniqueEditRowIds = [...new Set(this.state.editedRows)];
         var bodyObj = [];
         data.map(function (row) {
@@ -112,8 +112,8 @@ export class ReactCircleCard extends React.Component<{}, State>{
             }
         });
 
-        // formátování pokud pro DateTime
-        // pole indexů sloupců, které jsou typu DateTime
+        // format cell if it is datetime
+        // indexes of columns that are datetime
         let dateTypeIndexes = [];
         for (let i = 0; i < colsTypes.length; i++) {
             const colsType = colsTypes[i];
@@ -121,7 +121,7 @@ export class ReactCircleCard extends React.Component<{}, State>{
         }
         for (let i = 0; i < bodyObj.length; i++) {
             const row = bodyObj[i];
-            // upravuje pouze sloupce, které jsou DateTime
+            // edits only columns that are datetime
             for (let j = 0; j < dateTypeIndexes.length; j++) {
                 const dateTypeIndex = dateTypeIndexes[j];
                 row[cols[dateTypeIndex]] = this.formatDate(row[cols[dateTypeIndex]]);
@@ -148,13 +148,14 @@ export class ReactCircleCard extends React.Component<{}, State>{
             });
     }
 
+    // show/hide delete buttons
     private handleDelBtnClick(event) {
         this.setState((prevState => ({
             delButtVis: !prevState.delButtVis
         })));
     }
 
-    // smazání řádky
+    // delete row
     private handleDelRowBtnClick(rowIndex, event) {
         let data = this.state.data;
         let deleteRow = data[rowIndex];
@@ -169,7 +170,7 @@ export class ReactCircleCard extends React.Component<{}, State>{
         })));
     }
 
-    // formátování DateTime stringu na ISO string
+    // format datetime string to ISO string
     private formatDate(rawDate) {
         if (rawDate) {
             let splitDateString = rawDate.split("/");
@@ -184,7 +185,7 @@ export class ReactCircleCard extends React.Component<{}, State>{
         return "";
     }
 
-    // přidání řádky
+    // add new row
     private handleNewBtnClick(event) {
         const data = this.state.data;
         const cols = this.state.cols;
@@ -216,18 +217,18 @@ export class ReactCircleCard extends React.Component<{}, State>{
         const delColIndex = this.state.delColIndex;
         let tableBodyJsx = [];
 
-        // pro každou řádku
+        // for each row
         for (let i = 0; i < data.length; i++) {
 
             const row = data[i];
             let rowsJsx = [];
 
-            // skrýt pokud je smazaný
+            // hide if row is deleted
             if (row["DEL"]) {
                 continue;
             }
 
-            // buňka pro talčítko smazání
+            // cell for delete button
             if (this.state.delButtVis) {
                 rowsJsx.push(
                     <TableCell padding="none">
@@ -238,9 +239,9 @@ export class ReactCircleCard extends React.Component<{}, State>{
                 );
             }
 
-            // pro každou její buňku
+            // for each cell
             for (let j = 0; j < cols.length; j++) {
-                // pokud se nejedná o buňku s ID
+                // if it is not ID cell
                 if (j != pkColIndex && j != delColIndex) {
                     var col = cols[j];
                     var value = row[col];
@@ -270,8 +271,7 @@ export class ReactCircleCard extends React.Component<{}, State>{
         const pkColIndex = this.getIndexOfPkCol();
         const delColIndex = this.state.delColIndex;
 
-        // sloupec na mazání
-
+        // column for delete buttons
         if (this.state.delButtVis) {
             tableHeaderJsx.push(
                 <TableCell
@@ -282,7 +282,7 @@ export class ReactCircleCard extends React.Component<{}, State>{
             )
         }
 
-        // ostatní sloupce
+        // other columns
         for (let i = 0; i < cols.length; i++) {
 
             if (i != pkColIndex && i != delColIndex) {
