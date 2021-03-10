@@ -13,7 +13,7 @@ article, aside, canvas, details, embed,
 figure, figcaption, footer, header, hgroup, 
 menu, nav, output, ruby, section, summary,
 time, mark, audio, video {
-	margin: 0;
+	margin: 0 !important;
 	padding: 0;
     border: 0;
     vertical-align: baseline;
@@ -22,134 +22,27 @@ time, mark, audio, video {
 th { 
     font-weight: bold !important;
     font-size: 1rem !important;
+    background: white !important;
 }
 
-.flex--justify-between {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+table {
+    border: none !important;
+    border-radius: 0px !important;
 }
 
-/* OTHERS */
-
-.button {
-    padding: 7px 12px;
-
-    /* Text */
-    font-size: 0.9em;
-
-    /* Border */
-    border-radius: 3px;
-    border-style: solid;
-    border-width: 0.5px;
-
-    /* Colors */
-    background-color:#a7a6a6;
-    border-color: #ffffff;
-    color: #ffffff;
+.mui-table-container {
+    box-shadow: none !important;
 }
 
-.button:focus {
-    /* Outline */
-    outline-style: none;
-
-    /* Colors */
-    // background-color: #ffffff00;
-    // border-color: #a7a6a6;
-    // color: #a7a6a6;
+.mui-paper {
+    box-shadow: none !important;
 }
-
-.button:active {
-    
-    /* Colors */
-    background-color:#868686;
-    border-color: #ffffff;
-    color: #ffffff;
-}
-
-.button_add {
-    padding: 7px 12px;
-
-    /* Text */
-    font-size: 0.9em;
-
-    /* Border */
-    border-radius: 3px;
-    border-style: solid;
-    border-width: 0.5px;
-
-    /* Colors */
-    background-color:#bdbdbd;
-    border-color: #ffffff;
-    color: #ffffff;
-}
-
-.button_add:focus {
-    /* Outline */
-    outline-style: none;
-
-    /* Border */
-    border-width: thin;
-
-    /* Colors */
-    background-color: #ffffff00;
-    border-color:#bdbdbd;
-    color: #bdbdbd;
-}
-
-.button_add:active {
-    
-    /* Colors */
-    background-color: #868686;
-    border-color: #ffffff;
-    color: #ffffff;
-}
-
-.button_bin{
-    display: block;
-    margin: auto;
-
-    /* Border */
-    border: 0ch;
-
-    /* Colors */
-    background-color: #ffffff00;
-}
-
-.button_bin:focus {
-    /* Border */
-    border: 0px;
-
-    /* Colors */
-    background-color: #ffffff00;
-}
-
-.button_bin:active {
-    /* Border */
-    border: 0px;
-
-    /* Colors */
-    background-color: #ffffff00;
-}
-
 
 .flex--justify-right {
     display: flex;
     justify-content: flex-end;
 }
 
-.mb-1 {
-    margin-bottom: 5px;
-}
-
-.mr-1 {
-    margin-right: 5px;
-}
-
 .mb-2 {
     margin-bottom: 10px;
-}
-
-.mb-3 {
-    margin-bottom: 3px;
 }

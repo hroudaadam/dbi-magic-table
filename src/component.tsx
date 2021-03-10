@@ -177,7 +177,7 @@ export class ReactCircleCard extends React.Component<{}, State>{
             let day = parseInt(splitDateString[0]);
             let month = parseInt(splitDateString[1]) - 1;
             let year = parseInt(splitDateString[2]);
-    
+
             let date = new Date(year, month, day);
             date.setHours(date.getHours() + 1);
             return date.toISOString();
@@ -302,34 +302,36 @@ export class ReactCircleCard extends React.Component<{}, State>{
 
 
     render() {
-        const sizeStyle = { height: this.state.size };
+        const container = { height: this.state.size };
         const delButtonText = this.state.delButtVis ? "Hide" : "Delete";
 
         return (
             <div>
-                <div className="flex--justify-right mb-2">
-                    <Box mr={1}>
-                        <Button size="small" disableElevation variant="contained" onClick={this.handleNewBtnClick}>Add</Button>
-                    </Box>
-                    <Box mr={1}>
-                        <Button size="small" disableElevation variant="contained" onClick={this.handleDelBtnClick}>{delButtonText}</Button>
-                    </Box>
-                    <Box>
-                        <Button size="small" disableElevation variant="contained" onClick={this.handleSaveBtnClick}>Save</Button>
-                    </Box>
-                </div>
-                <TableContainer component={Paper} style={sizeStyle}>
-                    <Table stickyHeader size="small">
-                        <TableHead>
-                            <TableRow>
-                                {this.renderTableHeader()}
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {this.renderTableBody()}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
+                 <div className="flex--justify-right mb-2">
+                     <Box mr={1}>
+                         <Button size="small" disableElevation variant="contained" onClick={this.handleNewBtnClick}>Add</Button>
+                     </Box>
+                     <Box mr={1}>
+                         <Button size="small" disableElevation variant="contained" onClick={this.handleDelBtnClick}>{delButtonText}</Button>
+                     </Box>
+                     <Box>
+                         <Button size="small" disableElevation variant="contained" onClick={this.handleSaveBtnClick}>Save</Button>
+                     </Box>
+                 </div>
+                <Paper className="mui-paper">
+                    <TableContainer style={container} className="mui-table-container">
+                        <Table stickyHeader size="small">
+                            <TableHead>
+                                <TableRow>
+                                    {this.renderTableHeader()}
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {this.renderTableBody()}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                </Paper>
             </div>
         )
     }
