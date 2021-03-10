@@ -37,7 +37,7 @@ export class Visual implements IVisual {
 
         if (options.dataViews && options.dataViews[0]) {
             const formattedDataview = this.transformDataview(options.dataViews[0]);
-            const size = options.viewport.height - 50;
+            const size = options.viewport.height - 40;
 
             var apiUrl: String = "";
             if (options.dataViews[0].metadata.objects) {

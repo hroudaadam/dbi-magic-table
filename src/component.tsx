@@ -303,7 +303,6 @@ export class ReactCircleCard extends React.Component<{}, State>{
 
     render() {
         const sizeStyle = { height: this.state.size };
-        const cols = this.state.cols;
         const delButtonText = this.state.delButtVis ? "Hide" : "Delete";
 
         return (
@@ -320,7 +319,7 @@ export class ReactCircleCard extends React.Component<{}, State>{
                     </Box>
                 </div>
                 <TableContainer component={Paper} style={sizeStyle}>
-                    <Table stickyHeader size="small" aria-label="a dense table">
+                    <Table stickyHeader size="small">
                         <TableHead>
                             <TableRow>
                                 {this.renderTableHeader()}
