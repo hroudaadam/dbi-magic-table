@@ -22,7 +22,8 @@ export interface State {
     apiUrl,
     showModal,
     editedRows,
-    delButtVis
+    delButtVis,
+    fontSize
 }
 
 export const initialState: State = {
@@ -35,7 +36,8 @@ export const initialState: State = {
     apiUrl: "",
     showModal: false,
     editedRows: [],
-    delButtVis: false
+    delButtVis: false,
+    fontSize: 12
 }
 
 export class ReactCircleCard extends React.Component<{}, State>{
@@ -216,6 +218,7 @@ export class ReactCircleCard extends React.Component<{}, State>{
         const pkColIndex = this.getIndexOfPkCol();
         const delColIndex = this.state.delColIndex;
         let tableBodyJsx = [];
+        const fontSize = {fontSize: `${this.state.fontSize}px`};
 
         // for each row
         for (let i = 0; i < data.length; i++) {
@@ -250,7 +253,7 @@ export class ReactCircleCard extends React.Component<{}, State>{
 
                     rowsJsx.push(
                         <TableCell >
-                            <Input disableUnderline={true} multiline={true} value={value} onChange={this.handleCellChanged.bind(this, eventContext)} />
+                            <Input style={fontSize} disableUnderline={true} multiline={true} value={value} onChange={this.handleCellChanged.bind(this, eventContext)} />
                         </TableCell>
                     );
                 }
@@ -270,6 +273,7 @@ export class ReactCircleCard extends React.Component<{}, State>{
         const cols = this.state.cols;
         const pkColIndex = this.getIndexOfPkCol();
         const delColIndex = this.state.delColIndex;
+        const fontSize = {fontSize: `${this.state.fontSize + 2}px`};
 
         // column for delete buttons
         if (this.state.delButtVis) {
@@ -291,6 +295,7 @@ export class ReactCircleCard extends React.Component<{}, State>{
                 tableHeaderJsx.push(
                     <TableCell
                         key={i}
+                        style={fontSize}
                     >
                         {column}
                     </TableCell>

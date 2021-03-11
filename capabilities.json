@@ -36,12 +36,18 @@
     ],
     "objects": {
         "apiTest": {
-            "displayName": "API setting",
+            "displayName": "Custom setting",
             "properties": {
                 "apiUrl": {
                     "displayName": "API URL",
                     "type": {
                         "text": true
+                    }
+                },
+                "fontSize": {
+                    "displayName": "Font size",
+                    "type": {
+                        "numeric": true
                     }
                 }
             }

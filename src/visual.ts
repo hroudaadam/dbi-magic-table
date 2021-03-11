@@ -39,10 +39,14 @@ export class Visual implements IVisual {
             const formattedDataview = this.transformDataview(options.dataViews[0]);
             const size = options.viewport.height - 40;
 
-            var apiUrl: String = "";
+            let apiUrl: String = "";
+            let fontSize: Number = 12;
             if (options.dataViews[0].metadata.objects) {
                 if (options.dataViews[0].metadata.objects.apiTest.apiUrl) {
                     apiUrl = options.dataViews[0].metadata.objects.apiTest.apiUrl.toString();
+                }
+                if (options.dataViews[0].metadata.objects.apiTest.fontSize) {
+                    fontSize = parseInt(options.dataViews[0].metadata.objects.apiTest.fontSize.toString());
                 }
             }
 
@@ -56,7 +60,8 @@ export class Visual implements IVisual {
                 apiUrl: apiUrl,
                 showModal: false,
                 editedRows: [],
-                delButtVis: false
+                delButtVis: false,
+                fontSize: fontSize
             });
         } else {
             ReactCircleCard.update(initialState);
