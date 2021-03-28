@@ -13,29 +13,43 @@ import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
 
 export interface State {
-    data,
+    rows,
     cols,
     colsTypes,
+
     pkCol,
+    pkColIndex,
+
+    delCol,
     delColIndex,
+
     size,
-    apiUrl,
-    editedRows,
-    delButtVis,
     fontSize
+    delButtVis,
+
+    apiUrl,
+
+    editedRows,
 }
 
 export const initialState: State = {
-    data: [],
+    rows: [],
     cols: [],
     colsTypes: [],
+
     pkCol: null,
+    pkColIndex: null,
+    
+    delCol: null,
     delColIndex: null,
+
     size: 200,
-    apiUrl: "",
-    editedRows: [],
+    fontSize: 12,
     delButtVis: false,
-    fontSize: 12
+
+    apiUrl: "",
+
+    editedRows: [],
 }
 
 export class ReactCircleCard extends React.Component<{}, State>{
@@ -75,8 +89,8 @@ export class ReactCircleCard extends React.Component<{}, State>{
         let { rowI, col } = eventContext;
         
         // edit value in store object
-        let data = this.state.data;
-        let editRow = data[rowI];
+        const rows = this.state.rows;
+        let editRow = rows[rowI];
         editRow[col] = value;
 
         // add record of row that has been edited 
@@ -84,30 +98,26 @@ export class ReactCircleCard extends React.Component<{}, State>{
         editedRows.push(editRow.ID);
 
         this.setState((prevState => ({
-            data: data,
+            rows: rows,
             editedRows: editedRows
         })));
     }
 
-    // returns index of ID column in columns array
-    private getIndexOfPkCol() {
-        var cols: Array<String> = this.state.cols;
-        return cols.findIndex(col => col === this.state.pkCol);
-    }
-
     // save changes
     private handleSaveBtnClick(event) {
-        if (this.getIndexOfPkCol() < 0) {
-            return;
-        }
-        const data = this.state.data;
+        const rows = this.state.rows;
         const cols = this.state.cols;
         const colsTypes = this.state.colsTypes;
+        const pkColIndex = this.state.pkColIndex;
+        
+        if (pkColIndex < 0) {
+            return;
+        }
 
         // getting only edited rows
-        var uniqueEditRowIds = [...new Set(this.state.editedRows)];
-        var bodyObj = [];
-        data.map(function (row) {
+        let uniqueEditRowIds = [...new Set(this.state.editedRows)];
+        let bodyObj = [];
+        rows.map(function (row) {
             if (uniqueEditRowIds.indexOf(row.ID) >= 0) {
                 bodyObj.push(row);
             }
@@ -129,10 +139,8 @@ export class ReactCircleCard extends React.Component<{}, State>{
             }
         }
 
-        // "https://prod-140.westeurope.logic.azure.com:443/workflows/101633d73f5447d2b60a837670fdbadc/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=3B_Oq59FZuJVXG8nq3k4pHLgTn64p6i7FlUwTTNQIsw";
-        var url = this.state.apiUrl;
-        var bodyStr = JSON.stringify(bodyObj);
-        console.log(bodyStr);
+        let url = this.state.apiUrl;
+        let bodyStr = JSON.stringify(bodyObj);
 
         fetch(url, {
             method: "POST",
@@ -158,15 +166,15 @@ export class ReactCircleCard extends React.Component<{}, State>{
 
     // delete row
     private handleDelRowBtnClick(rowIndex, event) {
-        let data = this.state.data;
-        let deleteRow = data[rowIndex];
+        const rows = this.state.rows;
+        let deleteRow = rows[rowIndex];
         deleteRow["DEL"] = true;
 
         let editedRows = this.state.editedRows;
         editedRows.push(deleteRow.ID);
 
         this.setState((prevState => ({
-            data: data,
+            rows: rows,
             editedRows: editedRows
         })));
     }
@@ -188,11 +196,10 @@ export class ReactCircleCard extends React.Component<{}, State>{
 
     // add new row
     private handleNewBtnClick(event) {
-        const data = this.state.data;
+        const rows = this.state.rows;
         const cols = this.state.cols;
 
-        let newObj = {
-        };
+        let newObj = {};
 
         newObj[this.state.pkCol] = -1;
         newObj["DEL"] = false;
@@ -204,25 +211,25 @@ export class ReactCircleCard extends React.Component<{}, State>{
             }
         }
 
-        data.unshift(newObj);
+        rows.unshift(newObj);
 
         this.setState((prevState => ({
-            data: data
+            rows: rows
         })));
     }
 
     private renderTableBody() {
-        let cols = this.state.cols;
-        let data = this.state.data;
-        const pkColIndex = this.getIndexOfPkCol();
+        const cols = this.state.cols;
+        const rows = this.state.rows;
         const delColIndex = this.state.delColIndex;
-        let tableBodyJsx = [];
+        const pkColIndex = this.state.pkColIndex;
         const fontSize = {fontSize: `${this.state.fontSize}px`};
+        let tableBodyJsx = [];
 
         // for each row
-        for (let i = 0; i < data.length; i++) {
+        for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
 
-            const row = data[i];
             let rowsJsx = [];
 
             // hide if row is deleted
@@ -267,10 +274,60 @@ export class ReactCircleCard extends React.Component<{}, State>{
         return tableBodyJsx;
     }
 
+    private renderTableRow(rowIndex) {
+        const rows = this.state.rows;
+        const cols = this.state.cols;
+        const pkColIndex = this.state.pkColIndex;
+        const delColIndex = this.state.delColIndex;
+        const fontSize = {fontSize: `${this.state.fontSize}px`};
+
+        const row = rows[rowIndex];
+        let rowJsx = [];
+
+        // hide if row is deleted
+        if (row["DEL"]) {
+            return null;
+        }
+
+        // cell for delete button
+        if (this.state.delButtVis) {
+            rowJsx.push(
+                <TableCell padding="none">
+                    <IconButton>
+                        <DeleteIcon fontSize="small" onClick={this.handleDelRowBtnClick.bind(this, rowIndex)} />
+                    </IconButton>
+                </TableCell>
+            );
+        }
+
+        // other cells
+        for (let j = 0; j < cols.length; j++) {
+            // if it is not PK column and delete dolumn
+            if (j != pkColIndex && j != delColIndex) {
+                let col = cols[j];
+                let value = row[col];
+
+                const eventContext = { rowI: rowIndex, col: col };
+
+                rowJsx.push(
+                    <TableCell >
+                        <Input style={fontSize} disableUnderline={true} multiline={true} value={value} onChange={this.handleCellChanged.bind(this, eventContext)} />
+                    </TableCell>
+                );
+            }
+        }
+
+        return (
+            <TableRow key={"row-" + rowIndex}>
+                {rowJsx}
+            </TableRow>
+        );
+    }
+
     private renderTableHeader() {
         let tableHeaderJsx = [];
         const cols = this.state.cols;
-        const pkColIndex = this.getIndexOfPkCol();
+        const pkColIndex = this.state.pkColIndex;
         const delColIndex = this.state.delColIndex;
         const fontSize = {fontSize: `${this.state.fontSize + 2}px`};
 

@@ -38,7 +38,7 @@ export class Visual implements IVisual {
             const formattedDataview = this.transformDataview(options.dataViews[0]);
             const size = options.viewport.height - 40;
 
-            let apiUrl: String = "";
+            let apiUrl: String = "https://prod-140.westeurope.logic.azure.com:443/workflows/101633d73f5447d2b60a837670fdbadc/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=3B_Oq59FZuJVXG8nq3k4pHLgTn64p6i7FlUwTTNQIsw";
             let fontSize: Number = 12;
             if (options.dataViews[0].metadata.objects) {
                 if (options.dataViews[0].metadata.objects.apiTest.apiUrl) {
@@ -50,16 +50,23 @@ export class Visual implements IVisual {
             }
 
             ReactCircleCard.update({
-                data: formattedDataview.data,
+                rows: formattedDataview.rows,
                 cols: formattedDataview.cols,
                 colsTypes: formattedDataview.colsTypes,
+
                 pkCol: formattedDataview.pkCol,
+                pkColIndex: formattedDataview.pkColIndex,
+
+                delCol: formattedDataview.delCol,
                 delColIndex: formattedDataview.delColIndex,
+
                 size: size,
-                apiUrl: apiUrl,
-                editedRows: [],
+                fontSize: fontSize,
                 delButtVis: false,
-                fontSize: fontSize
+
+                apiUrl: apiUrl,
+
+                editedRows: [],
             });
         } else {
             ReactCircleCard.update(initialState);
@@ -76,23 +83,26 @@ export class Visual implements IVisual {
 
     private transformDataview(dataView) {
         let colsRaw = dataView.table.columns;
-        let rows = dataView.table.rows;
-        const delColName = "DEL";
+        let rowsRaw = dataView.table.rows;
+        const delCol = "DEL";
+        let cols = [];
 
         // column transformation
-        let cols = [];
         for (let i = 0; i < colsRaw.length; i++) {
             const column = colsRaw[i];
             cols.push(column.displayName);
         }        
 
         // helper column for delete
-        cols.push(delColName);
+        cols.push(delCol);
         let delColIndex = cols.length - 1;
 
-        // get name of column containing ID
-        let pkCol = colsRaw.find(col => col.roles.id);
-        pkCol = pkCol.displayName;
+        // get name of column with PK
+        let pkColFound = colsRaw.find(col => col.roles.id);
+        let pkCol = pkColFound.displayName;
+
+        // get index of column with PK
+        let pkColIndex = cols.findIndex(col => col === pkCol);
 
         // get data type of columns
         let colsTypes = [];
@@ -109,9 +119,9 @@ export class Visual implements IVisual {
         colsTypes.push("*");
 
         // transform rows
-        let data = [];
-        for (let i = 0; i < rows.length; i++) {
-            const row = rows[i];
+        let rows = [];
+        for (let i = 0; i < rowsRaw.length; i++) {
+            const row = rowsRaw[i];
             let newRowObject = {};
 
             for (let j = 0; j < cols.length; j++) {
@@ -126,22 +136,26 @@ export class Visual implements IVisual {
                 }
             }
             // helper column for delete - bool if the row was deleted
-            newRowObject[delColName] = false;
+            newRowObject[delCol] = false;
 
-            data.push(newRowObject);
+            rows.push(newRowObject);
         }
 
         // sort rows - ID
-        data.sort(function(a, b) { 
+        rows.sort(function(a, b) { 
             return b[pkCol] - a[pkCol];
           });
 
         return {
+            rows: rows,
             cols: cols,
-            data: data,
+            colsTypes: colsTypes,
+
             pkCol: pkCol,
+            pkColIndex: pkColIndex,
+
+            delCol: delCol,
             delColIndex: delColIndex,
-            colsTypes: colsTypes
         }
     }
 
