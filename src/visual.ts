@@ -22,7 +22,6 @@ import 'fontsource-roboto';
 export class Visual implements IVisual {
     private target: HTMLElement;
     private reactRoot: React.ComponentElement<any, any>;
-    private viewport: IViewport;
     private settings: VisualSettings;
 
     constructor(options: VisualConstructorOptions) {
@@ -58,7 +57,6 @@ export class Visual implements IVisual {
                 delColIndex: formattedDataview.delColIndex,
                 size: size,
                 apiUrl: apiUrl,
-                showModal: false,
                 editedRows: [],
                 delButtVis: false,
                 fontSize: fontSize
@@ -148,13 +146,13 @@ export class Visual implements IVisual {
     }
 
     private formatDate(rawDate) {
-        var date = new Date(rawDate);
+        let date = new Date(rawDate);
         date.setDate(date.getDate() + 1);
 
-        var strDay = (date.getUTCDate() < 10 ? "0" : "") + date.getUTCDate();
-        var strMonth = ((date.getUTCMonth() + 1) < 10 ? "0" : "") + (date.getUTCMonth() + 1);
-        var strYear = date.getUTCFullYear();
-        var strDate = strDay + "/" + strMonth + "/" + strYear
+        let strDay = (date.getUTCDate() < 10 ? "0" : "") + date.getUTCDate();
+        let strMonth = ((date.getUTCMonth() + 1) < 10 ? "0" : "") + (date.getUTCMonth() + 1);
+        let strYear = date.getUTCFullYear();
+        let strDate = strDay + "/" + strMonth + "/" + strYear
 
         return strDate;
     }

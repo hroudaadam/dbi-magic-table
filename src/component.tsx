@@ -20,7 +20,6 @@ export interface State {
     delColIndex,
     size,
     apiUrl,
-    showModal,
     editedRows,
     delButtVis,
     fontSize
@@ -34,7 +33,6 @@ export const initialState: State = {
     delColIndex: null,
     size: 200,
     apiUrl: "",
-    showModal: false,
     editedRows: [],
     delButtVis: false,
     fontSize: 12
@@ -59,7 +57,6 @@ export class ReactCircleCard extends React.Component<{}, State>{
         if (typeof ReactCircleCard.updateCallback === 'function') {
             ReactCircleCard.updateCallback(newState);
         }
-
     }
 
     public componentWillMount() {
@@ -76,11 +73,13 @@ export class ReactCircleCard extends React.Component<{}, State>{
     private handleCellChanged(eventContext, event) {
         let value = event.target.value;
         let { rowI, col } = eventContext;
-
+        
+        // edit value in store object
         let data = this.state.data;
         let editRow = data[rowI];
         editRow[col] = value;
 
+        // add record of row that has been edited 
         let editedRows = this.state.editedRows;
         editedRows.push(editRow.ID);
 
